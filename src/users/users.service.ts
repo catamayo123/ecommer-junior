@@ -33,4 +33,14 @@ export class UsersService {
   async updateUser(id: string, userData: Partial<UserEntity>): Promise<void> {
     await this.userRepository.update(id, userData);
   }
+
+  // LISTAR TODOS LOS USUARIOS
+  async findAllUsers(): Promise<UserEntity[]> {
+    return this.userRepository.find();
+  }
+
+  // ELIMINAR USUARIO
+  async removeUser(id: string): Promise<void> {
+    await this.userRepository.delete(id);
+  }
 }
