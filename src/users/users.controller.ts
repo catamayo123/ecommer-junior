@@ -7,29 +7,26 @@ import { UserRole } from './entities/user.entity';
 
 @Controller('admin/users')
 @UseGuards(JwtAuthGuard)
+@Roles(UserRole.ADMIN) // guard a nivel de clase pq todos los metodos los tiene que hacer el admin
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @Roles(UserRole.ADMIN)
   findAllUsers() {
     return this.usersService.findAllUsers();
   }
 
   @Get(':id')
-  @Roles(UserRole.ADMIN)
   findUserById(@Param('id') id: string) {
     return this.usersService.findUserById(id);
   }
 
   @Patch(':id/role')
-  @Roles(UserRole.ADMIN)
-  updateUserRole(@Param('id') id: string, @Body() dto: UpdateUserRoleDto) {
-    return this.usersService.updateUser(id, dto);
+  updateUserRole(@Param('id') id: string, @Body() updateUserdto: UpdateUserRoleDto) {
+    return this.usersService.updateUser(id, updateUserdto);
   }
 
   @Delete(':id')
-  @Roles(UserRole.ADMIN)
   removeUser(@Param('id') id: string) {
     return this.usersService.removeUser(id);
   }
