@@ -21,10 +21,10 @@ async function bootstrap() {
     .setVersion('1.0')
     .addBearerAuth()
     .build();
-
+  // para la subida de archivos 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-
+  
   await app.listen(process.env.PORT ?? 3000);
   console.log(`La app esta se esta ejecutando en: http://localhost:${process.env.PORT ?? 3000}`);
 }
