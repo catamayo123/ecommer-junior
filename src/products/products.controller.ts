@@ -22,8 +22,8 @@ export class ProductsController {
   @Get('admin/all')
   @UseGuards(JwtAuthGuard)
   @Roles(UserRole.ADMIN)
-  findAllProductsAdmin() {
-    return this.productsService.findAllProductsAdmin();
+  findAllProductsAdmin(@Query() query: QueryProductDto) {
+    return this.productsService.findAllProductsAdmin(query);
   }
 
   @Get(':slug')
