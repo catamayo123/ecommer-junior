@@ -2,20 +2,34 @@
 
 Productos: Cursos + eBooks (digitales)
 
-Roles: Cliente | Admin 
+Roles: Cliente | Admin
+ 
 Autenticación: JWT + verificación de email (código 4 dígitos simulado por consola en esta version)
+
 Carrito: Persistente en DB, expira 48h sin actividad 
+
 Pago: Simulado ( admin marca como pagado)
+
 Órdenes: Pendiente → Pagado → Completado → Descargado / Cancelado → Reembolsado 
+
 Categorías: Jerárquicas (padre → hijo con parentId)
+
 Productos: Slug auto-generado, isActive para ocultar, descuento temporal, upload de portada   (uploads/portadas/) y archivo (uploads/archivos/)
+
 Entrega: eBook → link JWT 24h por email | Curso → contenido en app con JWT 
+
 Archivos: Subida manual con Multer + ServeStaticModule para servir
-Reseñas: Rating 1-5 + comentario , requieren compra completada 
+
+Reseñas: Rating 1-5 + comentario , requieren compra completada
+ 
 Idioma:          Español (mensajes, comentarios en código)
+
 BD: PostgreSQL + TypeORM con synchronize:true
+
 Documentación:   Swagger en /api
+
 Seguridad: Parámetros vinculados (previene SQL injection),  lista blanca para ordenamiento, JwtAuthGuard + RolesGuard globales
+
 Admin: Mismos endpoints + @Roles(UserRole.ADMIN), paginación y filtros también disponibles para admin en /api/products/admin/all
 
 2 - FASES DEL PROYECTO
