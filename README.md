@@ -1,6 +1,7 @@
 1 - FEATURES DEL PROYECTO
 
 Productos: Cursos + eBooks (digitales)
+
 Roles: Cliente | Admin 
 Autenticación: JWT + verificación de email (código 4 dígitos simulado por consola en esta version)
 Carrito: Persistente en DB, expira 48h sin actividad 
