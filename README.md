@@ -44,22 +44,24 @@ FASE 1 — Core
 •	setup.ps1
 •	Carpetas uploads/portadas y uploads/archivos
 
-FASE 2 — Pendiente (por orden de implementación)
-•	CartModule — Carrito persistente (crear, agregar item, quitar item, limpiar, expiración 48h)
-•	OrdersModule — Crear orden desde carrito (checkout), historial, cambio de estados
-•	PaymentsModule — Admin marca PAYMENT como pagado, transiciona ORDER.status
-•	ReviewsModule — Crear reseña (requiere compra completada), listar por producto
-•	ProfileModule — Ver/editar perfil, cambiar contraseña, historial de órdenes
-•	WishlistModule — Lista de favoritos (opcional)
-•	CouponsModule — Códigos de descuento (opcional)
-•	DownloadsModule — JWT link para eBooks, acceso a contenido de cursos
+FASE 2 — Carrito y Órdenes (pendiente)
+•	CartModule — Carrito persistente (CRUD, expiración 48h, priceAtPurchase, totales vivos)
+•	CouponsModule — Códigos de descuento creados por admin, integrados con carrito
+•	OrdersModule — Crear orden desde carrito (checkout), historial, flujo de estados (pending→paid→completed→downloaded /       cancelled→refunded)
+•	PaymentsModule — Admin marca PAYMENT como pagado (entidad separada OneToOne con Order), transiciona ORDER.status
+•	ReviewsModule — Crear reseña (requiere compra completada), listar por producto, admin puede eliminar
 
-FASE 3 — Mejoras (postergado)
+FASE 3 — Perfil y UX (pendiente)
+•	ProfileModule — Ver/editar perfil propio, cambiar contraseña, historial de órdenes
+•	WishlistModule — Lista de favoritos (opcional)
+•	DownloadsModule — JWT link 24h para eBooks, acceso a contenido de cursos
+
+FASE 4 — Pulido (postergado)
 •	Reset password con email
 •	Notificaciones por email (Nodemailer + Gmail SMTP)
 •	Soft delete
 •	Rate limiting
 •	Health check
-•	Migraciones (synchronize:false)
+•	Migraciones (synchronize: false)
 •	Tests
 
