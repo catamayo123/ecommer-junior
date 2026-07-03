@@ -22,7 +22,7 @@ Archivos: Subida manual con Multer + ServeStaticModule para servir
 
 Reseñas: Rating 1-5 + comentario , requieren compra completada
  
-Idioma:          Español (mensajes, comentarios en código)
+Idioma: Español (mensajes, comentarios en código)
 
 BD: PostgreSQL + TypeORM con synchronize:true
 

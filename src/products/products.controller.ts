@@ -15,8 +15,8 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
-  findAllProducts(@Query() query: QueryProductDto) {
-    return this.productsService.findAllProducts(query);
+  findAllProducts(@Query() queryProductDTO: QueryProductDto) {
+    return this.productsService.findAllProducts(queryProductDTO);
   }
 
   @Get('admin/all')
@@ -51,34 +51,38 @@ export class ProductsController {
   removeProduct(@Param('id') id: string) {
     return this.productsService.removeProduct(id);
   }
-
+  // GUARDAR PORTADA
   @Post('upload-cover/:id')
   @UseGuards(JwtAuthGuard)
   @Roles(UserRole.ADMIN)
+  // INTERCEPTOR para (validar, generar nombre aleatorio, guardar HDD los archivos
   @UseInterceptors(FileInterceptor('coverImage', {
-    storage: diskStorage({
-      destination: join(__dirname, '..', '..', 'uploads', 'portadas'),
-      filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, uniqueSuffix + extname(file.originalname));
+    storage: diskStorage({                                              // guardar archivo en el HDD y no en memoria
+      destination: join(__dirname, '..', '..', 'uploads', 'portadas'),  // ubucacion donde se guardara el archivo 
+
+      filename: (req, file, cb) => {                                    // funcion para generar el nombre del archivo
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9); // Milisegundos actuales + un numero rando de 9 digitos
+        cb(null, uniqueSuffix + extname(file.originalname)); // nombre generado + extension original del archivo
       },
     }),
-    fileFilter: (req, file, cb) => {
-      if (!file.mimetype.match(/^image\/(jpeg|png|webp|gif)$/)) {
+    // validar el tipo de archivo antes de guardarlo 
+    fileFilter: (req, file, cb) => { 
+      if (!file.mimetype.match(/^image\/(jpeg|png|webp|gif)$/)) {   // Regex que solo acepta tipos que empiecen con image/ y terminen en jpeg, png, webp o gif
         cb(new BadRequestException('Solo se permiten imágenes (JPEG, PNG, WebP, GIF)'), false);
       } else {
-        cb(null, true);
+        cb(null, true); // si el cb anterior no lanza error, permite guardar el archivo 
       }
     },
   }))
+  // Funcion para cargar la imagen en el parametro File despues que UseInterceptors(FileInterceptor) hizo su trabajo
   async uploadCover(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new BadRequestException('Debes subir una imagen');
     }
-    const coverPath = `uploads/portadas/${file.filename}`;
+    const coverPath = `uploads/portadas/${file.filename}`; 
     return this.productsService.updateProduct(id, { coverImage: coverPath } as UpdateProductDto);
   }
-
+  // GUARDAR ARCHIVO
   @Post('upload-file/:id')
   @UseGuards(JwtAuthGuard)
   @Roles(UserRole.ADMIN)
