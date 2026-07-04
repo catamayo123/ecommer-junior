@@ -6,29 +6,35 @@ Roles: Cliente | Admin
  
 Autenticación: JWT + verificación de email (código 4 dígitos simulado por consola en esta version)
 
-Carrito: Persistente en DB, expira 48h sin actividad 
+Carrito: Persistente en DB, expira 30 días sin actividad, priceAtPurchase y totales calculados en vivo
 
-Pago: Simulado ( admin marca como pagado)
+Pago: Simulado (admin marca como pagado), entidad PAYMENT separada (OneToOne con Order)
 
-Órdenes: Pendiente → Pagado → Completado → Descargado / Cancelado → Reembolsado 
+Órdenes: Pendiente → Pagado → Completado → Descargado / Cancelado → Reembolsado. ORDER_ITEM congela precio y genera downloadToken JWT 24h
 
 Categorías: Jerárquicas (padre → hijo con parentId)
 
-Productos: Slug auto-generado, isActive para ocultar, descuento temporal, upload de portada   (uploads/portadas/) y archivo (uploads/archivos/)
+Productos: Slug auto-generado, isActive para ocultar, descuento temporal, upload de portada (uploads/portadas/) y archivo (uploads/archivos/)
 
-Entrega: eBook → link JWT 24h por email | Curso → contenido en app con JWT 
+Entrega: eBook → link JWT 24h por email | Curso → contenido en app con JWT
 
 Archivos: Subida manual con Multer + ServeStaticModule para servir
 
-Reseñas: Rating 1-5 + comentario , requieren compra completada
+Cupones: Códigos de descuento creados por admin, aplicables al carrito
+
+Reseñas: Rating 1-5 + comentario, requieren compra completada
+
+Perfil: Ver/editar datos propios, cambiar contraseña, historial de órdenes
+
+Favoritos: Lista de deseos por usuario (opcional)
  
 Idioma: Español (mensajes, comentarios en código)
 
 BD: PostgreSQL + TypeORM con synchronize:true
 
-Documentación:   Swagger en /api
+Documentación: Swagger en /api
 
-Seguridad: Parámetros vinculados (previene SQL injection),  lista blanca para ordenamiento, JwtAuthGuard + RolesGuard globales
+Seguridad: Parámetros vinculados (previene SQL injection), lista blanca para ordenamiento, JwtAuthGuard + RolesGuard globales
 
 Admin: Mismos endpoints + @Roles(UserRole.ADMIN), paginación y filtros también disponibles para admin en /api/products/admin/all
 
@@ -45,7 +51,7 @@ FASE 1 — Core
 •	Carpetas uploads/portadas y uploads/archivos
 
 FASE 2 — Carrito y Órdenes (pendiente)
-•	CartModule — Carrito persistente (CRUD, expiración 48h, priceAtPurchase, totales vivos)
+•	CartModule — Carrito persistente (CRUD, expiración 30 días, priceAtPurchase, totales vivos)
 •	CouponsModule — Códigos de descuento creados por admin, integrados con carrito
 •	OrdersModule — Crear orden desde carrito (checkout), historial, flujo de estados (pending→paid→completed→downloaded /       cancelled→refunded)
 •	PaymentsModule — Admin marca PAYMENT como pagado (entidad separada OneToOne con Order), transiciona ORDER.status
