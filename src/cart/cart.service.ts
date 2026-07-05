@@ -8,7 +8,7 @@ import { Product } from '../products/entities/product.entity';
 import { AddItemDto } from './dto/add-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 
-const CART_EXPIRATION_DAYS = 30;
+const CART_EXPIRATION_DAYS = 30; // dias de expiracion 
 
 @Injectable()
 export class CartService {
@@ -21,81 +21,91 @@ export class CartService {
     private readonly productRepository: Repository<Product>,
   ) {}
 
-  // OBTENER CARRITO Y SI NO ESTA CREARLO
+  // OBTENER CARRITO EN LA BD Y SI NO ESTA CREARLO EN LA BD. Metodo para asegurar que siempre exista un carrito en la BD
   async getOrCreateCart(userId: string): Promise<Cart> {
     // Busca un carrito que coincida con el userid logueado con todas sus relaciones
     let cart = await this.cartRepository.findOne({
       where: { userId },
       relations: ['items', 'items.product'],
     });
-    // si no encuentra un carrito relacionado a ese usuario, , 
+    // si no encuentra un carrito relacionado a ese usuario,
     if (!cart) {
       cart = this.cartRepository.create({ userId }); // crea una instancia del carrito
-      cart = await this.cartRepository.save(cart); // salvalo
+      cart = await this.cartRepository.save(cart); // salvalo en la BD
       cart.items = [];  // limpia items para que no de error en los demas metodos
       return cart; // retorna el carrito recien creado
     }
-    // verificar si no han pasado los 30 
+    // verificar si no han pasado los 30 dias, devuelve el mismo carrito ya sea vacio o con los items que tenia 
     cart = await this.handleExpiration(cart);
-    return cart; // si no expiro devuelve el carrito 
+    return cart; // si no expiro devuelve el carrito con todos sus items
   }
 
+  // OBTENER EL CARRITO de un usuario
   async getCart(userId: string) {
     let cart = await this.cartRepository.findOne({
       where: { userId },
       relations: ['items', 'items.product'],
     });
-
+    // si no tiene carrito devuelve uno vacio
     if (!cart) {
       return { items: [], summary: { subtotal: 0, discount: 0, total: 0 }, lastActivity: null };
     }
-
+    // SI tiene validar que no expiro y devolverlo con todos sus items o vacio 
     cart = await this.handleExpiration(cart);
+
+    // retornar el carrito con todos sus items con los precios calculados en caliente
     return this.buildCartResponse(cart);
   }
 
-  async addItem(userId: string, dto: AddItemDto) {
-    const product = await this.productRepository.findOne({ where: { id: dto.productId, isActive: true } });
+  // ADICIONAR ITEMS AL CARRITO
+  async addItem(userId: string, addItemDto: AddItemDto) {
+    const product = await this.productRepository.findOne({ where: { id: addItemDto.productId, isActive: true } });
     if (!product) {
       throw new NotFoundException('Producto no encontrado o no disponible');
     }
-
+    // Devolver carrito nuevo o existente y validar que no halla expirado
     let cart = await this.getOrCreateCart(userId);
     cart = await this.handleExpiration(cart);
 
-    const existingItem = cart.items.find((item) => item.productId === dto.productId);
+    // buscar producto en el carrito
+    const existingItem = cart.items.find( (item) => item.productId === addItemDto.productId);
 
+    // Si existe el items en el carrito aumenta la cantidad, sino crea un nuevo items con el precio actual que tenga el producto,
     if (existingItem) {
-      existingItem.quantity += dto.quantity ?? 1;
+      existingItem.quantity += addItemDto.quantity ?? 1;
       await this.cartItemRepository.save(existingItem);
     } else {
       const newItem = this.cartItemRepository.create({
         cartId: cart.id,
-        productId: dto.productId,
-        quantity: dto.quantity ?? 1,
+        productId: addItemDto.productId,
+        quantity: addItemDto.quantity ?? 1,
         priceAtPurchase: Number(product.price),
         appliedDiscount: 0,
       });
-      await this.cartItemRepository.save(newItem);
+      await this.cartItemRepository.save(newItem); // , y guardalo en BD
     }
-
+    // reiniciar contador de actividad 
     await this.updateLastActivity(cart.id);
+
+    // retornar el carrito con todos los totales y subtorales calculados
     return this.getCart(userId);
   }
 
-  async updateItemQuantity(userId: string, itemId: string, dto: UpdateItemDto) {
-    const cart = await this.getOwnedCart(userId);
-    const item = cart.items.find((i) => i.id === itemId);
+  // MODIFICAR CANTIDAD DE ITEMS
+  async updateItemQuantity(userId: string, itemId: string, updateItemdto: UpdateItemDto) {
+    const cart = await this.getOwnedCart(userId); // Devuelveme el carrito de ese usuario si expiro o no 
+    const item = cart.items.find((i) => i.id === itemId); // devuelve items por su id
     if (!item) {
       throw new NotFoundException('Item no encontrado en el carrito');
     }
 
-    item.quantity = dto.quantity;
-    await this.cartItemRepository.save(item);
-    await this.updateLastActivity(cart.id);
-    return this.getCart(userId);
+    item.quantity = updateItemdto.quantity; // asigna la cantidad de items que tenga 
+    await this.cartItemRepository.save(item); // garda el items en la BD donde sea la cantidad igual a la que riene item.quantity
+    await this.updateLastActivity(cart.id); 
+    return this.getCart(userId); // devuelve el carrito modificado con todos sus totales y subtotales
   }
 
+  // ELIMINAR ITEMS DEL CARRITO
   async removeItem(userId: string, itemId: string) {
     const cart = await this.getOwnedCart(userId);
     const item = cart.items.find((i) => i.id === itemId);
@@ -107,11 +117,12 @@ export class CartService {
     await this.updateLastActivity(cart.id);
     return this.getCart(userId);
   }
-
+  
+  // LIMPIAR CARRITO COMPLETO POR EL USUARIO 
   async clearCart(userId: string) {
     let cart = await this.cartRepository.findOne({
       where: { userId },
-      relations: ['items'],
+      relations: ['items']
     });
 
     if (!cart) {
@@ -124,28 +135,31 @@ export class CartService {
     return this.getCart(userId);
   }
 
+  // BORRAR TODOS LOS CARRITOS QUE HALLAN EXPIRADOS Y RETORNA LA CANTIDAD QUE BORRO 
   async removeAllExpiredCarts(): Promise<number> {
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - CART_EXPIRATION_DAYS);
+    const currentDate = new Date(); 
+    currentDate.setDate(currentDate .getDate() - CART_EXPIRATION_DAYS); // resta a la fecha actual 30 dias 
 
+    // buscar carritos expirados en la BD y devolverlos en un arr
     const expiredCarts = await this.cartRepository
       .createQueryBuilder('cart')
       .leftJoinAndSelect('cart.items', 'items')
-      .where('cart.lastActivity < :cutoff', { cutoff })
+      .where('cart.lastActivity < :cutoff', { currentDate: currentDate })
       .getMany();
 
     let totalItemsRemoved = 0;
     for (const cart of expiredCarts) {
-      if (cart.items && cart.items.length > 0) {
-        await this.cartItemRepository.remove(cart.items);
-        totalItemsRemoved += cart.items.length;
+      if (cart.items && cart.items.length > 0) { // verificar si el arr existe y si tiene items
+        await this.cartItemRepository.remove(cart.items); // elimina los items del carrito 
+        totalItemsRemoved += cart.items.length; // total de items borrados 
       }
-      await this.cartRepository.remove(cart);
+      await this.cartRepository.remove(cart); // borrar carrito 
     }
 
-    return expiredCarts.length;
+    return expiredCarts.length; // devuelve total de carritos eliminados
   }
-
+  
+  // PROGRMAR LIMPIEZA DE LOS CARRITOS QUE LLEVEN MAS DE 30 DIAS EN EL SERVIDOR 
   @Cron(CronExpression.EVERY_DAY_AT_3AM)
   async handleExpiredCartsJob() {
     const count = await this.removeAllExpiredCarts();
@@ -153,7 +167,8 @@ export class CartService {
       console.log(`Limpieza automática: ${count} carritos expirados eliminados`);
     }
   }
-
+  
+  // DEVOLVER CARRITO DE UN USARIO EXPESIFICO SI EXPIRO O NO EXPIRO
   private async getOwnedCart(userId: string): Promise<Cart> {
     const cart = await this.cartRepository.findOne({
       where: { userId },
@@ -167,76 +182,87 @@ export class CartService {
     return this.handleExpiration(cart);
   }
 
-  // 
+  // DEVULVER CARRITO VACIO SI EXPIRO O CON SUS ITEMS SI NO HA EXPIRADO
   private async handleExpiration(cartEntity: Cart): Promise<Cart> {
-    const now = new Date();
-    const diffDays = (now.getTime() - cartEntity.lastActivity.getTime()) / (1000 * 60 * 60 * 24);
-    //
+    const nowDate = new Date(); // fecha actual del servidor en ml
+
+    // dif en ml desde ahora hasta la ultima actividad del carrito
+    const diffDays = (nowDate.getTime() - cartEntity.lastActivity.getTime()) / (1000 * 60 * 60 * 24); 
+
+    // si ya pasaron mas de 30 dias, limpiar carrito.
     if (diffDays >= CART_EXPIRATION_DAYS) { 
+      // si existe el arr de items y tiene almenos 1 items. Limpialo
       if (cartEntity.items && cartEntity.items.length > 0) {
-        await this.cartItemRepository.remove(cartEntity.items);
+        await this.cartItemRepository.remove(cartEntity.items); 
         cartEntity.items = [];
       }
-      cartEntity.lastActivity = now;
+
+      // asigna a la ultima actividad la fecha actual.
+      cartEntity.lastActivity = nowDate;
       await this.cartRepository.save(cartEntity);
     }
-
+    // retorna carrito actualizado, ya sea vacio o con los items que tenga si no ha expirado
     return cartEntity;
   }
 
+  // MODIFICAR ULTIMA ACTIVIAD DEL USUARIO EN EL CARRITO EN LA BD
   private async updateLastActivity(cartId: string): Promise<void> {
     await this.cartRepository.update(cartId, { lastActivity: new Date() });
   }
 
-  private buildCartResponse(cart: Cart) {
-    const items = (cart.items || []).map((item) => {
-      const product = item.product;
-      const unitPrice = product ? Number(product.price) : 0;
-      const quantity = item.quantity;
-      const subtotal = unitPrice * quantity;
-      const totalDiscount = Number(item.appliedDiscount) * quantity;
-      const total = subtotal - totalDiscount;
-
+  // TRANSFORMAR EL CARRITO ACTTUAL CON TODOS SUS ITEMS Y PRODUCTOS EN UN JSON ESTRUCTURADO POR TOTALES Y SUBTOTALES
+  private buildCartResponse(cart: Cart) { 
+    const items = (cart.items || []).map((cartItem) => { // Si cart.items es null, usar un arr bacio para que map() no de error
+ 
+      const product = cartItem.product; // obtiene el producto del carrito 
+      const currentPrice = product ? Number(product.price) : 0; // precio actual transformado de string a number, si es null, tomalo como 0
+      const quantity = cartItem.quantity; // cantiad de items actuales en el carrito
+      const subtotal = currentPrice * quantity; // subtotal = precioActual * cantidad de productos
+      const totalDiscount = Number(cartItem.appliedDiscount) * quantity; // totalDescuento = descuento aplicado * cant de productos
+      const total = subtotal - totalDiscount; // si no hay descuento el total = subtotal, porque totalDiscount es 0
+      
+      // Retornar un objeto transformado en JSON por cada items que contenga el carrito
       return {
-        id: item.id,
-        product: product
+        id: cartItem.id,
+        product: product // si el producto existe devuelve la informacion necesaria
           ? {
               id: product.id,
-              name: product.name,
+              name: product.name, 
               slug: product.slug,
               coverImage: product.coverImage,
-              price: unitPrice,
+              price: currentPrice,
               productType: product.productType,
             }
-          : null,
+          : null, // si no existe el producto devuelve null
         quantity,
-        unitPrice,
-        priceAtPurchase: Number(item.priceAtPurchase),
-        unitDiscount: Number(item.appliedDiscount),
+        unitPrice: currentPrice,
+        priceAtPurchase: Number(cartItem.priceAtPurchase), // precio que tenia cuando se agg al carrito
+        unitDiscount: Number(cartItem.appliedDiscount), // Descuento del cupón por unidad 
         subtotal,
         totalDiscount,
         total,
       };
     });
-
+    
+    // Calcular Resumen: el metodo reduce(), itera sobre todos los items y ejecuta lo que esta dentro
     const summary = items.reduce(
       (acc, item) => ({
-        subtotal: acc.subtotal + item.subtotal,
-        discount: acc.discount + item.totalDiscount,
-        total: acc.total + item.total,
+        subtotal: acc.subtotal + item.subtotal, // subtotal acumulado + subtotal del items
+        discount: acc.discount + item.totalDiscount, // descuento acumulado + descuento toal 
+        total: acc.total + item.total, // total acumulado + total del item
       }),
-      { subtotal: 0, discount: 0, total: 0 },
+      { subtotal: 0, discount: 0, total: 0 }, // valor incial del acc o acumulador
     );
-
+    // 
     return {
       id: cart.id,
       items,
-      summary: {
-        subtotal: Number(summary.subtotal.toFixed(2)),
+      summary: { // redondear la suma de todos los subtotales, discuentos y totales a 2 numeros despues de la coma
+        subtotal: Number(summary.subtotal.toFixed(2)), 
         discount: Number(summary.discount.toFixed(2)),
         total: Number(summary.total.toFixed(2)),
-      },
-      lastActivity: cart.lastActivity,
+      }, 
+      lastActivity: cart.lastActivity, // 
     };
   }
 }

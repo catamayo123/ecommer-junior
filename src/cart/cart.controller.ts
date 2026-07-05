@@ -10,36 +10,28 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  @Post()
-  getOrCreateCart(@CurrentUser('id') userId: string) {
-    return this.cartService.getOrCreateCart(userId);
-  }
-
+  // OBTENER CARRITO
   @Get()
   getCart(@CurrentUser('id') userId: string) {
     return this.cartService.getCart(userId);
   }
-
-  @Post('items')
+  // ADD ITEMS EN EL CARRITO
+  @Post('addItems')
   addItem(@CurrentUser('id') userId: string, @Body() dto: AddItemDto) {
     return this.cartService.addItem(userId, dto);
   }
-
-  @Patch('items/:id')
-  updateItemQuantity(
-    @CurrentUser('id') userId: string,
-    @Param('id') itemId: string,
-    @Body() dto: UpdateItemDto,
-  ) {
-    return this.cartService.updateItemQuantity(userId, itemId, dto);
+  // MODIFICAR CANTIDAD DE ITEMS EN EL CARRITO 
+  @Patch('items/update/:id')
+  updateItemQuantity( @CurrentUser('id') userId: string, @Param('id') itemId: string, @Body() UpdateItemDto: UpdateItemDto,) {
+    return this.cartService.updateItemQuantity(userId, itemId, UpdateItemDto);
   }
-
-  @Delete('items/:id')
+  // ELIMINAR ITEMS DEL CARRITO 
+  @Delete('items/delete/:id')
   removeItem(@CurrentUser('id') userId: string, @Param('id') itemId: string) {
     return this.cartService.removeItem(userId, itemId);
   }
-
-  @Delete()
+  // LIMPIAR CARRITO
+  @Delete('clear')
   clearCart(@CurrentUser('id') userId: string) {
     return this.cartService.clearCart(userId);
   }

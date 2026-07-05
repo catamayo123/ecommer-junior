@@ -3,8 +3,10 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 // createParamDecorator crea un decorador de parámetros personalizado
 export const CurrentUser = createParamDecorator(
+
   // data: el string opcional que pasas (ej: 'email')
   // ctx: el contexto de ejecución (tiene el request, response, etc.)
+  
   (data: string | undefined, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest(); // obtiene el request HTTP
     const user = request.user;                       // saca el usuario que puso Passport
