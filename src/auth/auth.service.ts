@@ -20,6 +20,7 @@ export class AuthService {
       // Las excepciones que se manejan aca son propias de nest JS
       throw new ConflictException('El email ya está siendo usado por otro usuario');
     }
+    
     // se coloca 10 por defecto para que sean 4 seg
     const hashedPassword = await bcrypt.hash(registerDTO.password, 10);
 
@@ -65,6 +66,7 @@ export class AuthService {
 
     return { message: 'Email verificado exitosamente' };
   }
+  
   // LOGUEARSE: COMPLIDO LOS PASOS ANTERIORES VERIFICAR
   async login(userLoginDto: LoginDto) {
     const user = await this.usersService.findUserByEmail(userLoginDto.email);
@@ -73,8 +75,8 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas');
     }
     // valdiar que el pass sea correcto contra el pass hasheado de la BD 
-    const passwordValid = await bcrypt.compare(userLoginDto.password, user.password);
-    if (!passwordValid) {
+    const passValid = await bcrypt.compare(userLoginDto.password, user.password);
+    if (!passValid) {
       throw new UnauthorizedException('Credenciales inválidas');
     }
     // validar verifiacion de email

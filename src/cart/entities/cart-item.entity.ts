@@ -10,6 +10,7 @@ export class CartItem {
   @Column({ type: 'uuid' })
   cartId!: string;
 
+  // muchos items pertencen a un carrito 
   @ManyToOne(() => Cart, (cart) => cart.items, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'cartId' })
   cart!: Cart;
