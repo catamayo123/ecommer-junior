@@ -9,6 +9,9 @@ import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
 import { CartModule } from './cart/cart.module';
 import { CouponsModule } from './coupons/coupons.module';
+import { OrderModule } from './order/order.module';
+import { PaymentModule } from './payment/payment.module';
+
 
 @Module({
   imports: [
@@ -41,6 +44,8 @@ import { CouponsModule } from './coupons/coupons.module';
     ProductsModule,
     CartModule,
     CouponsModule,
+    OrderModule,
+    PaymentModule,
   ],
 })
 export class AppModule {}

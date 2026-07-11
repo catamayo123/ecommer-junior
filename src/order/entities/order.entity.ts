@@ -17,6 +17,9 @@ export class Order {
   @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.PENDING })
   status!: OrderStatus;
 
+  @Column({ type: 'text', nullable: true })
+  cancelReason!: string | null;
+
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   total!: number;
 
