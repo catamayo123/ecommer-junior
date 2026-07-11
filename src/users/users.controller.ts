@@ -1,9 +1,9 @@
-import { Controller, Get, Param, Patch, Delete, Body, UseGuards } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UpdateUserRoleDto } from './dto/update-user-role.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Body, Controller, Delete, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import { UserRole } from '../../enum/index';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from './entities/user.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UpdateUserRoleDto } from './dto/update-user-role.dto';
+import { UsersService } from './users.service';
 
 @Controller('admin/users')
 @UseGuards(JwtAuthGuard)

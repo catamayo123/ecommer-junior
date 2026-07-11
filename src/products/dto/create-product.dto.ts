@@ -1,5 +1,5 @@
-import { IsString, IsNumber, IsEnum, IsOptional, IsBoolean, MinLength, MaxLength, Min, Max, IsUUID } from 'class-validator';
-import { ProductType } from '../entities/product.entity';
+import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString, IsUUID, Max, MaxLength, Min, MinLength } from 'class-validator';
+import { ProductType } from '../../../enum/index';
 
 export class CreateProductDto {
   @IsString()

@@ -1,8 +1,8 @@
 // QueryProductDto para validar y transformar automáticamente los parametros de busqueda que llegen
 
-import { IsOptional, IsString, IsEnum, IsNumber, IsUUID } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ProductType } from '../entities/product.entity';
+import { IsEnum, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
+import { ProductType } from '../../../enum/index';
 
 export class QueryProductDto {
   @IsOptional()

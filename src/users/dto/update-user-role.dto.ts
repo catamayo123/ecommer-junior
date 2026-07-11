@@ -1,5 +1,5 @@
 import { IsEnum } from 'class-validator';
-import { UserRole } from '../entities/user.entity';
+import { UserRole } from '../../../enum/index';
 
 export class UpdateUserRoleDto {
   @IsEnum(UserRole)

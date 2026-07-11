@@ -1,14 +1,14 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
-import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { QueryProductDto } from './dto/query-product.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UserRole } from '../../enum/index';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../users/entities/user.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CreateProductDto } from './dto/create-product.dto';
+import { QueryProductDto } from './dto/query-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductsService } from './products.service';
 
 @Controller('products')
 export class ProductsController {
@@ -51,11 +51,12 @@ export class ProductsController {
   removeProduct(@Param('id') id: string) {
     return this.productsService.removeProduct(id);
   }
+  
   // GUARDAR PORTADA
   @Post('upload-cover/:id')
   @UseGuards(JwtAuthGuard)
   @Roles(UserRole.ADMIN)
-  // INTERCEPTOR para (validar, generar nombre aleatorio, guardar HDD los archivos
+  // INTERCEPTOR para (validar, generar nombre aleatorio, guardar HDD los archivos)
   @UseInterceptors(FileInterceptor('coverImage', {
     storage: diskStorage({                                              // guardar archivo en el HDD y no en memoria
       destination: join(__dirname, '..', '..', 'uploads', 'portadas'),  // ubucacion donde se guardara el archivo 
@@ -82,6 +83,7 @@ export class ProductsController {
     const coverPath = `uploads/portadas/${file.filename}`; 
     return this.productsService.updateProduct(id, { coverImage: coverPath } as UpdateProductDto);
   }
+
   // GUARDAR ARCHIVO
   @Post('upload-file/:id')
   @UseGuards(JwtAuthGuard)

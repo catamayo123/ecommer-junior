@@ -1,10 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { ProductType } from '../../../enum/index';
 import { Category } from '../../categories/entities/category.entity';
-
-export enum ProductType {
-  COURSE = 'course',
-  EBOOK = 'ebook',
-}
 
 @Entity('products')
 export class Product {

@@ -1,7 +1,7 @@
-// Decorador para 
+// Decorador para saber que rol ocupa el cliente 
 
 import { SetMetadata } from '@nestjs/common'; // es una función de NestJS que permite adjuntar datos (metadata) a una ruta
-import { UserRole } from '../../users/entities/user.entity';
+import { UserRole } from '../../../enum/index';
 
 export const ROLES_KEY = 'roles'; // nombre de la clave con la que se guard el metadata
 
