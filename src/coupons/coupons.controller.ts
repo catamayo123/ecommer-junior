@@ -25,7 +25,7 @@ export class CouponsController {
   }
 
   // BUSCAR CUPON POR ID
-  @Get(':id')
+  @Get('find/:id')
   findCouponById(@Param('id') id: string) {
     return this.couponsService.findCouponById(id);
   }

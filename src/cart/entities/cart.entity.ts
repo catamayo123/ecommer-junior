@@ -11,14 +11,11 @@ export class Cart {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   lastActivity!: Date;
   
-  @CreateDateColumn()
-  createdAt!: Date;
-
-  // columna FK con users
+  // columna FK con Users
   @Column({ type: 'uuid' })
   userId!: string;       
   
-  // columna FK con cupon
+  // columna FK con Coupon
   @Column({ type: 'uuid', nullable: true })
   couponId!: string | null;
 
@@ -31,9 +28,12 @@ export class Cart {
   @OneToMany(() => CartItem, (item) => item.cart, { cascade: true })
   items!: CartItem[];
 
-  // Un carrito tiene muchos cupones 
+  // Un carrito tiene o no, muchos cupones 
   @ManyToOne(() => Coupon)
   @JoinColumn({name: 'couponId'})
-  cupon !: Coupon | null;
+  cupon!: Coupon | null;
+
+  @CreateDateColumn()
+  createdAt!: Date;
 
 }

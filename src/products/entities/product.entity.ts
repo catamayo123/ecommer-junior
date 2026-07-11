@@ -41,9 +41,11 @@ export class Product {
   @Column({ type: 'timestamp', nullable: true })
   discountEndDate!: Date;
 
+  // FK de Categorias
   @Column({ type: 'uuid', nullable: true })
   categoryId!: string;
 
+  // Muchos productos pertenecen a una categoria
   @ManyToOne(() => Category, { nullable: true })
   @JoinColumn({ name: 'categoryId' })
   category!: Category;

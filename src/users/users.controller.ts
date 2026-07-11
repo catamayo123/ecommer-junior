@@ -11,7 +11,7 @@ import { UserRole } from './entities/user.entity';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get()
+  @Get('find')
   findAllUsers() {
     return this.usersService.findAllUsers();
   }

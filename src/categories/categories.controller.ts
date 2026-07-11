@@ -10,12 +10,12 @@ import { UserRole } from '../users/entities/user.entity';
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
   // BUSCAR TODOS 
-  @Get()
+  @Get('findAll')
   findAllCategory() {
     return this.categoriesService.findAllCategory();
   }
   // BUSCAR CAT POR SU SLUG CON EL @Param('slug')
-  @Get(':slug')
+  @Get('find/:slug')
   findCategoryBySlug(@Param('slug') slug: string) {
     return this.categoriesService.findCategoryBySlug(slug);
   }
@@ -28,7 +28,7 @@ export class CategoriesController {
   }
 
   // MODIFICAR (SOLO ADMIN)
-  @Patch(':id')
+  @Patch('update/:id')
   @UseGuards(JwtAuthGuard) 
   @Roles(UserRole.ADMIN)
   updateCategory(@Param('id') id: string, @Body() updatedto: UpdateCategoryDto) {
@@ -36,7 +36,7 @@ export class CategoriesController {
   }
 
   // ELIMINAR (SOLO ADMIN)
-  @Delete(':id') 
+  @Delete('delete/:id') 
   @UseGuards(JwtAuthGuard)
   @Roles(UserRole.ADMIN)
   removeCategory(@Param('id') id: string) {

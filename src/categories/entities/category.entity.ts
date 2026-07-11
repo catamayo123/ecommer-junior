@@ -11,13 +11,16 @@ export class Category {
   @Column({ type: 'varchar', length: 150, unique: true })
   slug!: string;
 
+  // FK de la relacion entre las categorias y las subcategorias 
   @Column({ type: 'uuid', nullable: true })
   parentId!: string;
 
+  // Muchas subcategorias pertencen a una sola categoria 
   @ManyToOne(() => Category, (category) => category.children, { nullable: true })
   @JoinColumn({ name: 'parentId' })
   parent!: Category;
 
+  // Una cageria tiene muchas subcategorias 
   @OneToMany(() => Category, (category) => category.parent)
   children!: Category[];
 
@@ -27,5 +30,5 @@ export class Category {
 
 /*
   nullable: true  es para que typeorm y la BD sepa que puede ser nulo pq una categoria puede ser padre
-  si no se coloca, todas las categorias tienen que tener un padre 
+  si no se coloca el parentId.
 */

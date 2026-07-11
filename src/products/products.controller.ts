@@ -14,38 +14,38 @@ import { UserRole } from '../users/entities/user.entity';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-  @Get()
+  @Get('find')
   findAllProducts(@Query() queryProductDTO: QueryProductDto) {
     return this.productsService.findAllProducts(queryProductDTO);
   }
 
-  @Get('admin/all')
+  @Get('adminFindAll')
   @UseGuards(JwtAuthGuard)
   @Roles(UserRole.ADMIN)
   findAllProductsAdmin(@Query() query: QueryProductDto) {
     return this.productsService.findAllProductsAdmin(query);
   }
 
-  @Get(':slug')
+  @Get('find/:slug')
   findProductBySlug(@Param('slug') slug: string) {
     return this.productsService.findProductBySlug(slug);
   }
 
-  @Post()
+  @Post('create')
   @UseGuards(JwtAuthGuard)
   @Roles(UserRole.ADMIN)
   createProduct(@Body() createProductDto: CreateProductDto) {
     return this.productsService.createProduct(createProductDto);
   }
 
-  @Patch(':id')
+  @Patch('update/:id')
   @UseGuards(JwtAuthGuard)
   @Roles(UserRole.ADMIN)
   updateProduct(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productsService.updateProduct(id, updateProductDto);
   }
 
-  @Delete(':id')
+  @Delete('delete/:id')
   @UseGuards(JwtAuthGuard)
   @Roles(UserRole.ADMIN)
   removeProduct(@Param('id') id: string) {
