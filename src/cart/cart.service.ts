@@ -8,6 +8,7 @@ import { AddItemDto } from './dto/add-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { CartItem } from './entities/cart-item.entity';
 import { Cart } from './entities/cart.entity';
+import { CartResponse } from './interface/cart-response.interface';
 
 const CART_EXPIRATION_DAYS = 30; // dias de expiracion 
 
@@ -256,7 +257,7 @@ export class CartService {
   }
 
   // TRANSFORMAR EL CARRITO ACTTUAL CON TODOS SUS ITEMS Y PRODUCTOS EN UN JSON ESTRUCTURADO POR TOTALES Y SUBTOTALES
-  private async buildCartResponse(cart: Cart) {
+  private async buildCartResponse(cart: Cart): Promise<CartResponse> {
     let validDiscountPercent = 0;
     let cuponExpirado = false;
     //Si el carrito tiene cupon. cuponCode = code, sino cuponCode = null 
