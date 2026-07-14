@@ -1,11 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
-import { CartService } from '../cart/cart.service';
 import { OrderStatus, PaymentStatus } from '../../enum/index';
-import { OrderItem } from './entities/order-item.entity';
+import { CartService } from '../cart/cart.service';
 import { Payment } from '../payment/entities/payment.entity';
+import { OrderItem } from './entities/order-item.entity';
+import { Order } from './entities/order.entity';
 
 @Injectable()
 export class OrderService {
@@ -35,7 +35,7 @@ export class OrderService {
         }
 
         // some retorna true si no existe un items o mas con product en null, o undefine
-        const existedProductItem = cart.items.some( (item)=> !item.product )
+        const existedProductItem = cart.items.some((item) => !item.product)
 
         // validar todos items tengan un producto
         if (existedProductItem) {
@@ -52,7 +52,7 @@ export class OrderService {
         const saveOrder = await this.orderRepository.save(order)
 
         // Recorre todo los items del carrito con map y al final lo salva save(orderItems)
-        const orderItems = cart.items.map( (item: { product: { id: string } | null, priceAtPurchase: number} ) =>
+        const orderItems = cart.items.map((item: { product: { id: string } | null, priceAtPurchase: number }) =>
             this.orderItemRepository.create({
                 orderId: saveOrder.id,
                 productId: item.product?.id,
@@ -74,24 +74,63 @@ export class OrderService {
 
         // retornar la orden con todas sus relaciones 
         return await this.orderRepository.findOne({
-           where: {id: saveOrder.id},
-           relations: ['items', 'items.product', 'payment']
+            where: { id: saveOrder.id },
+            relations: ['items', 'items.product', 'payment']
         });
     }
 
     // BUSCAR TODAS LAS ORDENES O HISTORIAL DE ORDENES, mostrando las nuevas ordenes primero
-    async findAll( userId: string ){
+    async findAllOrder(userId: string) {
         return await this.orderRepository.find({
-            where: {userId},
+            where: { userId },
             relations: ['items', 'items.product', 'payment'],
-            order: {createdAt: 'DESC'}
+            order: { createdAt: 'DESC' }
         })
     }
 
     // BUSCAR ORDEN POR ID
-    async findOrderId( userId: string ){
-        const order = await this.orderRepository.findBy({
-            
+    async findOrderById(orderId: string, userId?: string) {
+        // si entra por parametro userId, agg al where
+        const where: any = { id: orderId };
+        if (userId) where.userId = userId;
+
+        const order = await this.orderRepository.findOne({
+            where,
+            relations: ['items', 'items.product', 'payment']
         })
+
+        // Si no existe la orden retorna exception
+        if (!order) {
+            throw new NotFoundException('Orden no encontrada')
+        }
+
+        return order
+    }
+
+    // CANCELAR ORDEN
+    async cancelOrder(orderId: string, reason?: string) {
+        const order = await this.findOrderById(orderId)
+
+        if (order.status !== OrderStatus.PENDING) {
+            throw new BadRequestException('La orden solo se puede cancelar en estado pendiente')
+        }
+
+        order.status = OrderStatus.CANCELLED
+        if (reason) order.cancelReason = reason
+        return await this.orderRepository.save(order);
+    }
+
+    // REEMBOLSAR ORDENES, SOLO PAGADAS O COMPLETADAS
+    async refund(orderId: string, reason?: string) {
+        const order = await this.findOrderById(orderId)
+
+        if (order.status !== OrderStatus.PAID && order.status !== OrderStatus.COMPLETED) {
+            throw new BadRequestException('Solo se pueden reembolsar Ordenes pagadas o completadas')
+        }
+
+        order.status = OrderStatus.REFUNDED
+        if (reason) order.cancelReason = reason
+
+        return await this.orderRepository.save(order)
     }
 }
