@@ -31,6 +31,6 @@ import { UsersModule } from '../users/users.module';
       useClass: RolesGuard,
     },
   ],
-  exports: [AuthService],
+  exports: [AuthService, JwtModule],
 })
-export class AuthModule {}
+export class AuthModule { }

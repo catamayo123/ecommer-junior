@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { OrderStatus, PaymentStatus } from 'enum';
+import { OrderStatus, PaymentStatus } from '../../enum/index';
 import { Repository } from 'typeorm';
 import { OrderItem } from '../order/entities/order-item.entity';
 import { Order } from '../order/entities/order.entity';
