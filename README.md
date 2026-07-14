@@ -41,6 +41,7 @@ Admin: Mismos endpoints + @Roles(UserRole.ADMIN), paginación y filtros también
 2 - FASES DEL PROYECTO
 FASE 1 — Core
 •	ConfigModule + TypeORM + PostgreSQL + ServeStaticModule
+
 •	 UsersModule (entity, service)
 •	AuthModule (register, verify-email, login, JWT, guards, decorators)
 •	CategoriesModule (CRUD jerárquico, slug)
