@@ -40,35 +40,59 @@ Admin: Mismos endpoints + @Roles(UserRole.ADMIN), paginación y filtros también
 
 2 - FASES DEL PROYECTO
 FASE 1 — Core
+
 •	ConfigModule + TypeORM + PostgreSQL + ServeStaticModule
 
 •	 UsersModule (entity, service)
+
 •	AuthModule (register, verify-email, login, JWT, guards, decorators)
+
 •	CategoriesModule (CRUD jerárquico, slug)
+
 •	UsersController (CRUD admin de usuarios)
+
 •	ProductsModule (CRUD, filtros, paginación, upload, slug, isActive)
+
 •	Swagger configurado
+
 •	setup.ps1
+
 •	Carpetas uploads/portadas y uploads/archivos
 
 FASE 2 — Carrito y Órdenes (pendiente)
+
 •	CartModule — Carrito persistente (CRUD, expiración 30 días, priceAtPurchase, totales vivos)
+
 •	CouponsModule — Códigos de descuento creados por admin, integrados con carrito
+
 •	OrdersModule — Crear orden desde carrito (checkout), historial, flujo de estados (pending→paid→completed→downloaded /       cancelled→refunded)
+
 •	PaymentsModule — Admin marca PAYMENT como pagado (entidad separada OneToOne con Order), transiciona ORDER.status
+
 •	ReviewsModule — Crear reseña (requiere compra completada), listar por producto, admin puede eliminar
 
 FASE 3 — Perfil y UX (pendiente)
+
 •	ProfileModule — Ver/editar perfil propio, cambiar contraseña, historial de órdenes
+
 •	WishlistModule — Lista de favoritos (opcional)
+
 •	DownloadsModule — JWT link 24h para eBooks, acceso a contenido de cursos
 
 FASE 4 — Pulido (postergado)
+
 •	Reset password con email
+
 •	Notificaciones por email (Nodemailer + Gmail SMTP)
+
 •	Soft delete
+
 •	Rate limiting
+
 •	Health check
+
 •	Migraciones (synchronize: false)
+
 •	Tests
+
 
