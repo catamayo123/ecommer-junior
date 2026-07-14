@@ -124,7 +124,7 @@ export class OrderService {
     async refund(orderId: string, reason?: string) {
         const order = await this.findOrderById(orderId)
 
-        if (order.status !== OrderStatus.PAID && order.status !== OrderStatus.COMPLETED) {
+        if (order.status !== OrderStatus.COMPLETED) {
             throw new BadRequestException('Solo se pueden reembolsar Ordenes pagadas o completadas')
         }
 

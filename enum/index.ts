@@ -13,7 +13,6 @@ export enum ProductType {
 // Estados por los que transita una Orden
 export enum OrderStatus {
   PENDING = 'pending',
-  PAID = 'paid',
   COMPLETED = 'completed',
   CANCELLED = 'cancelled',
   REFUNDED = 'refunded',
