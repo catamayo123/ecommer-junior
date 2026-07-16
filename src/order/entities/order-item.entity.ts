@@ -19,6 +19,9 @@ export class OrderItem {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   priceAtPurchase!: number;
 
+  @Column({ type: 'int', default: 0 })
+  renewalCount!: number;
+
   @Column({ type: 'varchar', nullable: true })
   downloadToken!: string | null;
 
