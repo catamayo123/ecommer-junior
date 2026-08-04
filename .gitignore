@@ -1,5 +1,9 @@
 # compiled output
 /dist
+
+# runtime files (uploads y archivos privados de productos)
+/uploads
+/private-files
 /node_modules
 /build
 

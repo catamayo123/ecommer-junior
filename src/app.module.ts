@@ -33,10 +33,11 @@ import { UsersModule } from './users/users.module';
         synchronize: true,
       }),
     }),
-    // subida de archivos estaticos 
+    // archivos estaticos publicos: SOLO portadas
+    // los archivos pagados se guardan en private-files y se sirven con token
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
-      serveRoot: '/uploads',
+      rootPath: join(__dirname, '..', 'uploads', 'portadas'),
+      serveRoot: '/uploads/portadas',
     }),
     AuthModule,
     UsersModule,

@@ -1,5 +1,6 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { UserRole } from '../../enum/index';
@@ -12,7 +13,7 @@ import { ProductsService } from './products.service';
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly productsService: ProductsService) { }
 
   @Get('find')
   findAllProducts(@Query() queryProductDTO: QueryProductDto) {
@@ -51,7 +52,7 @@ export class ProductsController {
   removeProduct(@Param('id') id: string) {
     return this.productsService.removeProduct(id);
   }
-  
+
   // GUARDAR PORTADA
   @Post('upload-cover/:id')
   @UseGuards(JwtAuthGuard)
@@ -67,7 +68,7 @@ export class ProductsController {
       },
     }),
     // validar el tipo de archivo antes de guardarlo 
-    fileFilter: (req, file, cb) => { 
+    fileFilter: (req, file, cb) => {
       if (!file.mimetype.match(/^image\/(jpeg|png|webp|gif)$/)) {   // Regex que solo acepta tipos que empiecen con image/ y terminen en jpeg, png, webp o gif
         cb(new BadRequestException('Solo se permiten imágenes (JPEG, PNG, WebP, GIF)'), false);
       } else {
@@ -80,7 +81,7 @@ export class ProductsController {
     if (!file) {
       throw new BadRequestException('Debes subir una imagen');
     }
-    const coverPath = `uploads/portadas/${file.filename}`; 
+    const coverPath = `uploads/portadas/${file.filename}`;
     return this.productsService.updateProduct(id, { coverImage: coverPath } as UpdateProductDto);
   }
 
@@ -90,7 +91,12 @@ export class ProductsController {
   @Roles(UserRole.ADMIN)
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
-      destination: join(__dirname, '..', '..', 'uploads', 'archivos'),
+      // carpeta privada FUERA de /uploads para que NO sea accesible por el servidor estatico
+      destination: (req, file, cb) => {
+        const dir = join(__dirname, '..', '..', 'private-files', 'productos');
+        mkdirSync(dir, { recursive: true });
+        cb(null, dir);
+      },
       filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
         cb(null, uniqueSuffix + extname(file.originalname));
@@ -101,7 +107,7 @@ export class ProductsController {
     if (!file) {
       throw new BadRequestException('Debes subir un archivo');
     }
-    const filePath = `uploads/archivos/${file.filename}`;
-    return this.productsService.updateProduct(id, { fileName: filePath } as UpdateProductDto);
+    // se guarda SOLO el nombre del archivo (los archivos pagados son privados, no se expone la ruta)
+    return this.productsService.updateProduct(id, { fileName: file.filename } as UpdateProductDto);
   }
 }
