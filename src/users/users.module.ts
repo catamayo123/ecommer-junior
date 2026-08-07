@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './entities/user.entity';
-import { UsersService } from './users.service';
-import { UsersController } from './users.controller';
 import { ProfileController } from './profile.controller';
+import { UsersController } from './users.controller';
+import { UsersService } from './users.service';
+import { AdminService } from './admin.service';
 
 
 @Module({
@@ -12,8 +13,9 @@ import { ProfileController } from './profile.controller';
     TypeOrmModule.forFeature([UserEntity]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
-  providers: [UsersService],
+  providers: [UsersService, AdminService],
   controllers: [UsersController, ProfileController],
-  exports: [UsersService],
+  exports: [UsersService]
 })
-export class UsersModule {}
+
+export class UsersModule { }

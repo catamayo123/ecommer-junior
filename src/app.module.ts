@@ -17,12 +17,14 @@ import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: '.dev.env',
+      envFilePath: 'config/.dev.env',
       isGlobal: true,
     }),
+
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
+
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
         host: config.get<string>('DB_HOST'),
@@ -34,12 +36,14 @@ import { UsersModule } from './users/users.module';
         synchronize: true,
       }),
     }),
+
     // archivos estaticos publicos: SOLO portadas
     // los archivos pagados se guardan en private-files y se sirven con token
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads', 'portadas'),
       serveRoot: '/uploads/portadas',
     }),
+
     AuthModule,
     UsersModule,
     CategoriesModule,
@@ -51,4 +55,4 @@ import { UsersModule } from './users/users.module';
     DownloadsModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
