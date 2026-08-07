@@ -13,6 +13,7 @@ import { PaymentModule } from './payment/payment.module';
 import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
 
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -49,6 +50,5 @@ import { UsersModule } from './users/users.module';
     PaymentModule,
     DownloadsModule,
   ],
-  
 })
 export class AppModule {}
