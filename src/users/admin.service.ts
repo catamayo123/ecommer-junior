@@ -49,10 +49,10 @@ export class AdminService implements OnModuleInit {
 			name: adminName,
 			email: adminEmail,
 			password: hashedPass,
-			emailVerified: false,
+			emailVerified: true,
 			role: UserRole.ADMIN,
 			verificationCode: null		
-		})
+		});
 
 		this.logger.log(`Admin creado satisfactoriamente: UserName: ${adminName} y emailUser: ${adminEmail}`)
 	}

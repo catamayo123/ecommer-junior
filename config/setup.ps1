@@ -3,7 +3,7 @@
 
 # Leer variables del .dev.env
 $envVars = @{}
-Get-Content ".dev.env" | ForEach-Object {
+Get-Content (Join-Path $PSScriptRoot ".dev.env") | ForEach-Object {
     if ($_ -match "^\s*([^#=]+)=(.*)") {
         $envVars[$matches[1]] = $matches[2].Trim()
     }

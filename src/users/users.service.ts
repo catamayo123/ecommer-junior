@@ -98,7 +98,7 @@ export class UsersService {
 
     if(!user) throw new NotFoundException('Usuario no encontrado')
 
-    const isValid = await bcrypt.compare(currentPass, newPass);
+    const isValid = await bcrypt.compare(currentPass, user.password);
     if (!isValid) throw new BadRequestException('El pass no concide')
     
     const hashedNewPass = await bcrypt.hash(newPass, 10);

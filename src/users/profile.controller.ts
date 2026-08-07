@@ -25,7 +25,7 @@ export class ProfileController {
     }
 
     @Patch('profilePass')
-    changePassword(@CurrentUser('id') userId: string, data: ChangePasswordDto){
+    changePassword(@CurrentUser('id') userId: string, @Body() data: ChangePasswordDto){
         return this.userService.changePassword(userId, data.currentPass, data.newPass)
     }
 

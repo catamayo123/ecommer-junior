@@ -18,5 +18,6 @@ import { Cart } from './entities/cart.entity';
   ],
   controllers: [CartController],
   providers: [CartService],
+  exports: [CartService],  
 })
 export class CartModule { }
