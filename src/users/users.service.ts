@@ -105,4 +105,6 @@ export class UsersService {
     await this.updateUser(id, {password: hashedNewPass})
     return {message: 'Password actualziado correctamente'}
   }
+
+  // HISTORIAL DE ORDENES 
 }

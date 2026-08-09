@@ -39,6 +39,7 @@ Seguridad: Parámetros vinculados (previene SQL injection), lista blanca para or
 Admin: Mismos endpoints + @Roles(UserRole.ADMIN), paginación y filtros también disponibles para admin en /api/products/admin/all
 
 2 - FASES DEL PROYECTO
+
 FASE 1 — Core ( LISTO )
 
 •	ConfigModule + TypeORM + PostgreSQL + ServeStaticModule
