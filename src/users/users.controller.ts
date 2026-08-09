@@ -3,7 +3,7 @@ import { UserRole } from '../../enum/index';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { UpdateUserRoleDto } from './dto/update-user-role.dto';
+import { UpdateUserRoleDTO } from './DTO/update-user-role.dto';
 import { UsersService } from './users.service';
 
 @Controller('admin/users')
@@ -23,8 +23,8 @@ export class UsersController {
   }
 
   @Patch('updateUser/:id')
-  updateUserRole(@Param('id') id: string, @Body() updateUserdto: UpdateUserRoleDto) {
-    return this.usersService.updateUser(id, updateUserdto);
+  updateUserRole(@Param('id') id: string, @Body() updateUserDTO: UpdateUserRoleDTO) {
+    return this.usersService.updateUser(id, updateUserDTO);
   }
 
   @Delete('removeUser/:id')

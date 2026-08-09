@@ -4,8 +4,8 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { CouponsService } from './coupons.service';
-import { CreateCouponDto } from './dto/create-coupon.dto';
-import { UpdateCouponDto } from './dto/update-coupon.dto';
+import { CreateCouponDTO } from './DTO/create-coupon.dto';
+import { UpdateCouponDTO } from './DTO/update-coupon.dto';
 
 @Controller('coupons')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -15,8 +15,8 @@ export class CouponsController {
 
   // CREAR CUPON
   @Post('createCupons')
-  createCoupon(@Body() createCouponDto: CreateCouponDto) {
-    return this.couponsService.createCoupon(createCouponDto);
+  createCoupon(@Body() createCouponDTO: CreateCouponDTO) {
+    return this.couponsService.createCoupon(createCouponDTO);
   }
 
   // BUSCAR TODOS LOS CUPONES
@@ -33,8 +33,8 @@ export class CouponsController {
 
   // MODIFICAR CUPON
   @Patch('update/:id')
-  updateCoupon(@Param('id') id: string, @Body() updateCouponDto: UpdateCouponDto) {
-    return this.couponsService.updateCoupon(id, updateCouponDto);
+  updateCoupon(@Param('id') id: string, @Body() updateCouponDTO: UpdateCouponDTO) {
+    return this.couponsService.updateCoupon(id, updateCouponDTO);
   }
 
   // ELIMINAR CUPON

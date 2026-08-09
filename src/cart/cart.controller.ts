@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { CartService } from './cart.service';
-import { AddItemDto } from './dto/add-item.dto';
-import { UpdateItemDto } from './dto/update-item.dto';
-import { ApplyCouponDto } from './dto/apply-coupon.dto';
+import { AddItemDTO } from './DTO/add-item.dto';
+import { UpdateItemDTO } from './DTO/update-item.dto';
+import { ApplyCouponDTO } from './DTO/apply-coupon.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
@@ -19,13 +19,13 @@ export class CartController {
 
   // ADD ITEMS EN EL CARRITO
   @Post('addItems')
-  addItem(@CurrentUser('id') userId: string, @Body() itemBody: AddItemDto) {
+  addItem(@CurrentUser('id') userId: string, @Body() itemBody: AddItemDTO) {
     return this.cartService.addItem(userId, itemBody);
   }
 
   // MODIFICAR CANTIDAD DE ITEMS EN EL CARRITO 
   @Patch('items/update/:id')
-  updateItemQuantity( @CurrentUser('id') userId: string, @Param('id') itemId: string, @Body() updateItemBody: UpdateItemDto,) {
+  updateItemQuantity( @CurrentUser('id') userId: string, @Param('id') itemId: string, @Body() updateItemBody: UpdateItemDTO,) {
     return this.cartService.updateItemQuantity(userId, itemId, updateItemBody);
   }
 
@@ -43,7 +43,7 @@ export class CartController {
   
   // ADD CUPON AL CARRITO
   @Post('addCoupon')
-  applyCoupon(@CurrentUser('id') userId: string, @Body() couponBody: ApplyCouponDto) {
+  applyCoupon(@CurrentUser('id') userId: string, @Body() couponBody: ApplyCouponDTO) {
     return this.cartService.applyCoupon(userId, couponBody.code);
   }
   

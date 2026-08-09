@@ -1,16 +1,16 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateProductDto } from './dto/create-product.dto';
-import { QueryProductDto } from './dto/query-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { Product } from './entities/product.entity';
+import { CreateProductDTO } from './DTO/create-product.dto';
+import { QueryProductDTO } from './DTO/query-product.dto';
+import { UpdateProductDTO } from './DTO/update-product.dto';
+import { ProductEntity } from './entities/product.entity';
 
 @Injectable()
 export class ProductsService {
   constructor(
-    @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>,
+    @InjectRepository(ProductEntity)
+    private readonly productRepository: Repository<ProductEntity>,
   ) { }
   // BUSCAR TODOS LOS PRODUCTOS 
   /*
@@ -19,7 +19,7 @@ export class ProductsService {
     (true; DROP TABLE products) y SQL tome DROP TABLE products, como comando, con los parametros vinculados
     SQL lo toma de forma sting literal, como una cadena de texto para ser mas preciso y no como una claupsula SQL
   */
-  async findAllProducts(queryDTO: QueryProductDto) {
+  async findAllProducts(queryDTO: QueryProductDTO) {
 
     const queryBuilder = this.productRepository.createQueryBuilder('product')
       .leftJoinAndSelect('product.category', 'category') // trayendo a que cat pertenece ese producto 
@@ -78,7 +78,7 @@ export class ProductsService {
   }
 
   // BUSCAR TODOS LOS PRODUCTOS PARA EL ADMIN (con paginación, filtros, ordenamiento y sin filtrar por isActive)
-  async findAllProductsAdmin(queryDTO: QueryProductDto) {
+  async findAllProductsAdmin(queryDTO: QueryProductDTO) {
 
     const queryBuilder = this.productRepository.createQueryBuilder('product')
       .leftJoinAndSelect('product.category', 'category');
@@ -126,7 +126,7 @@ export class ProductsService {
   }
 
   // BUSCAR POR SLUG
-  async findProductBySlug(slug: string): Promise<Product> {
+  async findProductBySlug(slug: string): Promise<ProductEntity> {
     const product = await this.productRepository.findOne({
       where: { slug },
       relations: ['category'],
@@ -140,7 +140,7 @@ export class ProductsService {
   }
 
   // BUSCAR PRODUCTO POR ID 
-  async findProductById(id: string): Promise<Product> {
+  async findProductById(id: string): Promise<ProductEntity> {
     const product = await this.productRepository.findOne({ where: { id } });
 
     if (!product) {
@@ -150,24 +150,24 @@ export class ProductsService {
   }
 
   // CREAR PRODUCTOS
-  async createProduct(createProductDto: CreateProductDto): Promise<Product> {
-    const slug = this.generateSlug(createProductDto.name);
+  async createProduct(createProductDTO: CreateProductDTO): Promise<ProductEntity> {
+    const slug = this.generateSlug(createProductDTO.name);
 
     const existingProduct = await this.productRepository.findOne({ where: { slug } });
     if (existingProduct) {
       throw new ConflictException('Ya existe un producto con ese nombre');
     }
 
-    const product = this.productRepository.create({ ...createProductDto, slug });
+    const product = this.productRepository.create({ ...createProductDTO, slug });
     return this.productRepository.save(product);
   }
 
   // MODIFICAR PRODUCTOS
-  async updateProduct(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
+  async updateProduct(id: string, updateProductDTO: UpdateProductDTO): Promise<ProductEntity> {
     const product = await this.findProductById(id);
 
-    if (updateProductDto.name) {
-      const slug = this.generateSlug(updateProductDto.name);
+    if (updateProductDTO.name) {
+      const slug = this.generateSlug(updateProductDTO.name);
       const existingProduct = await this.productRepository.findOne({ where: { slug } });
 
       if (existingProduct && existingProduct.id !== id) {
@@ -177,7 +177,7 @@ export class ProductsService {
       product.slug = slug;
     }
 
-    Object.assign(product, updateProductDto);
+    Object.assign(product, updateProductDTO);
     return this.productRepository.save(product);
   }
 

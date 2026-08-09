@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CreateCategoryDTO } from './DTO/create-category.dto';
+import { UpdateCategoryDTO } from './DTO/update-category.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -24,16 +24,16 @@ export class CategoriesController {
   @Post('createdCat')
   @UseGuards(JwtAuthGuard, RolesGuard) // necesita autenticacion JWT para ser creada la cat 
   @Roles(UserRole.ADMIN)  // Tienes que ser rol admin para poder crearla cat
-  createCategory(@Body() createDto: CreateCategoryDto) {
-    return this.categoriesService.createCategory(createDto);
+  createCategory(@Body() createDTO: CreateCategoryDTO) {
+    return this.categoriesService.createCategory(createDTO);
   }
 
   // MODIFICAR (SOLO ADMIN)
   @Patch('update/:id')
   @UseGuards(JwtAuthGuard, RolesGuard) 
   @Roles(UserRole.ADMIN)
-  updateCategory(@Param('id') id: string, @Body() updatedto: UpdateCategoryDto) {
-    return this.categoriesService.updateCategory(id, updatedto);
+  updateCategory(@Param('id') id: string, @Body() updateDTO: UpdateCategoryDTO) {
+    return this.categoriesService.updateCategory(id, updateDTO);
   }
 
   // ELIMINAR (SOLO ADMIN)

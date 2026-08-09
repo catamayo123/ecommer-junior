@@ -2,9 +2,9 @@ import { Injectable, ConflictException, UnauthorizedException, BadRequestExcepti
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/users.service';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
-import { VerifyEmailDto } from './dto/verify-email.dto';
+import { RegisterDTO } from './DTO/register.dto';
+import { LoginDTO } from './DTO/login.dto';
+import { VerifyEmailDTO } from './DTO/verify-email.dto';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +14,7 @@ export class AuthService {
   ) {}
 
   // REGISTRARSE CREA USUARIO EN LA BD SIN EL CODIGO DE VERIFICACION DEL CORREO
-  async register(registerDTO: RegisterDto) {
+  async register(registerDTO: RegisterDTO) {
     const existingUser = await this.usersService.findUserByEmail(registerDTO.email);
     if (existingUser) {
       // Las excepciones que se manejan aca son propias de nest JS
@@ -43,8 +43,8 @@ export class AuthService {
   }
 
   // VERIFICAR CODIGO DE 4 DIGITOS PARA POSTERIORMENTE ENTRAR A LA APP
-  async verifyEmail(verifyEmailDto: VerifyEmailDto) {
-    const user = await this.usersService.findUserByEmail(verifyEmailDto.email);
+  async verifyEmail(verifyEmailDTO: VerifyEmailDTO) {
+    const user = await this.usersService.findUserByEmail(verifyEmailDTO.email);
 
     // ¿EXISTE EL USUARIO?: si no existe findUserByEmail devuelve null y lanza la excepcion
     if (!user) {
@@ -55,7 +55,7 @@ export class AuthService {
       throw new BadRequestException('El email ya está verificado');
     }
     // ¿EL CÓDIGO ES CORRECTO? Si user.emailVerified = false, verificar que los codigos de BD mas el que envio sean iguales
-    if (user.verificationCode !== verifyEmailDto.code) {
+    if (user.verificationCode !== verifyEmailDTO.code) {
       throw new BadRequestException('Código de verificación incorrecto');
     }
     // Si no entra a ningun if modificar BD
@@ -68,14 +68,14 @@ export class AuthService {
   }
   
   // LOGUEARSE: COMPLIDO LOS PASOS ANTERIORES VERIFICAR
-  async login(userLoginDto: LoginDto) {
-    const user = await this.usersService.findUserByEmail(userLoginDto.email);
+  async login(userLoginDTO: LoginDTO) {
+    const user = await this.usersService.findUserByEmail(userLoginDTO.email);
     // valdiar que exista el usuario con ese correo 
     if (!user) {
       throw new UnauthorizedException('Credenciales inválidas');
     }
     // valdiar que el pass sea correcto contra el pass hasheado de la BD 
-    const passValid = await bcrypt.compare(userLoginDto.password, user.password);
+    const passValid = await bcrypt.compare(userLoginDTO.password, user.password);
     if (!passValid) {
       throw new UnauthorizedException('Credenciales inválidas');
     }

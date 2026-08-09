@@ -3,11 +3,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
 import { CategoriesService } from './categories.service';
 import { CategoriesController } from './categories.controller';
-import { Category } from './entities/category.entity';
+import { CategoryEntity } from './entities/category.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Category]),
+    TypeOrmModule.forFeature([CategoryEntity]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   providers: [CategoriesService],

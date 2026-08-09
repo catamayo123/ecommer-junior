@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
 @Entity('coupons')
-export class Coupon {
+export class CouponEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 

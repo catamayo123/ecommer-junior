@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
 import { OrderService } from '../order/order.service';
-import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UpdateProfileDTO } from './DTO/update-profile.dto';
 import { UserEntity } from './entities/user.entity';
 
 @Injectable()
@@ -60,7 +60,7 @@ export class UsersService {
   }
 
   // ACTUALIZAR PERFIL: nombre || email
-  async updateProfile(id: string, data: UpdateProfileDto) {
+  async updateProfile(id: string, data: UpdateProfileDTO) {
     const user = await this.findUserById(id)
     if (!user) throw new NotFoundException('Usuario no encontrado')
 

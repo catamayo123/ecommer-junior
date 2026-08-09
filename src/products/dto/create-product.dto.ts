@@ -1,7 +1,7 @@
 import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString, IsUUID, Max, MaxLength, Min, MinLength } from 'class-validator';
 import { ProductType } from '../../../enum/index';
 
-export class CreateProductDto {
+export class CreateProductDTO {
   @IsString()
   @MinLength(2)
   @MaxLength(200)

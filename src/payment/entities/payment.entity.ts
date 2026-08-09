@@ -1,10 +1,10 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { PaymentStatus } from '../../../enum/index';
-import { Order } from '../../order/entities/order.entity';
+import { OrderEntity } from '../../order/entities/order.entity';
 import { UserEntity } from '../../users/entities/user.entity';
 
 @Entity('payments')
-export class Payment {
+export class PaymentEntity {
 
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -27,9 +27,9 @@ export class Payment {
   adminId!: string | null;
 
   // Un pago tiene una Orden
-  @OneToOne(() => Order, (order) => order.payment)
+  @OneToOne(() => OrderEntity, (order) => order.payment)
   @JoinColumn({ name: 'orderId' })
-  order!: Order;
+  order!: OrderEntity;
 
   // Muchos pagos son manejados por un usuario: Admin
   @ManyToOne(() => UserEntity, { nullable: true })

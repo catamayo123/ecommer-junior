@@ -1,9 +1,9 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Product } from '../../products/entities/product.entity';
-import { Order } from './order.entity';
+import { ProductEntity } from '../../products/entities/product.entity';
+import { OrderEntity } from './order.entity';
 
 @Entity('order_items')
-export class OrderItem {
+export class OrderItemEntity {
 
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -29,12 +29,12 @@ export class OrderItem {
   downloadTokenExpiresAt!: Date | null;
 
   // Muchas OrderItems pertencen a una orden. Se borra en casadad 
-  @ManyToOne(() => Order, (order) => order.items, { onDelete: 'CASCADE' })
+  @ManyToOne(() => OrderEntity, (order) => order.items, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'orderId' })
-  order!: Order;
+  order!: OrderEntity;
 
   // Muchos productos pertenecen a una orden 
-  @ManyToOne(() => Product)
+  @ManyToOne(() => ProductEntity)
   @JoinColumn({ name: 'productId' })
-  product!: Product;
+  product!: ProductEntity;
 }

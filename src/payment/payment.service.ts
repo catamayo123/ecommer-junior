@@ -3,19 +3,19 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrderStatus, PaymentStatus } from '../../enum/index';
-import { OrderItem } from '../order/entities/order-item.entity';
-import { Order } from '../order/entities/order.entity';
-import { Payment } from './entities/payment.entity';
+import { OrderItemEntity } from '../order/entities/order-item.entity';
+import { OrderEntity } from '../order/entities/order.entity';
+import { PaymentEntity } from './entities/payment.entity';
 
 @Injectable()
 export class PaymentService {
 	constructor(
-		@InjectRepository(Payment)
-		private readonly paymentRepository: Repository<Payment>,
-		@InjectRepository(Order)
-		private readonly orderRepository: Repository<Order>,
-		@InjectRepository(OrderItem)
-		private readonly orderItemRepository: Repository<OrderItem>,
+		@InjectRepository(PaymentEntity)
+		private readonly paymentRepository: Repository<PaymentEntity>,
+		@InjectRepository(OrderEntity)
+		private readonly orderRepository: Repository<OrderEntity>,
+		@InjectRepository(OrderItemEntity)
+		private readonly orderItemRepository: Repository<OrderItemEntity>,
 		private readonly jwtService: JwtService
 	) { }
 

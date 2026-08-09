@@ -1,6 +1,6 @@
 import { IsString, IsOptional, IsUUID, MinLength, MaxLength } from 'class-validator';
 
-export class CreateCategoryDto {
+export class CreateCategoryDTO {
   @IsString()
   @MinLength(2)
   @MaxLength(100)

@@ -3,11 +3,11 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CouponsService } from '../coupons/coupons.service';
-import { Product } from '../products/entities/product.entity';
-import { AddItemDto } from './dto/add-item.dto';
-import { UpdateItemDto } from './dto/update-item.dto';
-import { CartItem } from './entities/cart-item.entity';
-import { Cart } from './entities/cart.entity';
+import { ProductEntity } from '../products/entities/product.entity';
+import { AddItemDTO } from './DTO/add-item.dto';
+import { UpdateItemDTO } from './DTO/update-item.dto';
+import { CartItemEntity } from './entities/cart-item.entity';
+import { CartEntity } from './entities/cart.entity';
 import { CartResponse } from './interface/cart-response.interface';
 
 const CART_EXPIRATION_DAYS = 30; // dias de expiracion 
@@ -15,17 +15,17 @@ const CART_EXPIRATION_DAYS = 30; // dias de expiracion
 @Injectable()
 export class CartService {
   constructor(
-    @InjectRepository(Cart)
-    private readonly cartRepository: Repository<Cart>,
-    @InjectRepository(CartItem)
-    private readonly cartItemRepository: Repository<CartItem>,
-    @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>,
+    @InjectRepository(CartEntity)
+    private readonly cartRepository: Repository<CartEntity>,
+    @InjectRepository(CartItemEntity)
+    private readonly cartItemRepository: Repository<CartItemEntity>,
+    @InjectRepository(ProductEntity)
+    private readonly productRepository: Repository<ProductEntity>,
     private readonly couponsService: CouponsService,
   ) { }
 
   // OBTENER CARRITO EN LA BD Y SI NO ESTA CREARLO EN LA BD. Metodo para asegurar que siempre exista un carrito en la BD
-  async getOrCreateCart(userId: string): Promise<Cart> {
+  async getOrCreateCart(userId: string): Promise<CartEntity> {
     // Busca un carrito que coincida con el userid logueado con todas sus relaciones
     let cart = await this.cartRepository.findOne({
       where: { userId },
@@ -61,8 +61,8 @@ export class CartService {
   }
 
   // ADICIONAR ITEMS AL CARRITO
-  async addItem(userId: string, addItemDto: AddItemDto) {
-    const product = await this.productRepository.findOne({ where: { id: addItemDto.productId, isActive: true } });
+  async addItem(userId: string, addItemDTO: AddItemDTO) {
+    const product = await this.productRepository.findOne({ where: { id: addItemDTO.productId, isActive: true } });
     if (!product) {
       throw new NotFoundException('Producto no encontrado o no disponible');
     }
@@ -71,17 +71,17 @@ export class CartService {
     cart = await this.handleExpiration(cart);
 
     // buscar producto en el carrito
-    const existingItem = cart.items.find((item) => item.productId === addItemDto.productId);
+    const existingItem = cart.items.find((item) => item.productId === addItemDTO.productId);
 
     // Si existe el items en el carrito aumenta la cantidad, sino crea un nuevo items con el precio actual que tenga el producto,
     if (existingItem) {
-      existingItem.quantity += addItemDto.quantity ?? 1;
+      existingItem.quantity += addItemDTO.quantity ?? 1;
       await this.cartItemRepository.save(existingItem);
     } else {
       const newItem = this.cartItemRepository.create({
         cartId: cart.id,
-        productId: addItemDto.productId,
-        quantity: addItemDto.quantity ?? 1,
+        productId: addItemDTO.productId,
+        quantity: addItemDTO.quantity ?? 1,
         priceAtPurchase: Number(product.price),
         appliedDiscount: 0,
       });
@@ -136,14 +136,14 @@ export class CartService {
   }
 
   // MODIFICAR CANTIDAD DE ITEMS
-  async updateItemQuantity(userId: string, itemId: string, updateItemdto: UpdateItemDto) {
+  async updateItemQuantity(userId: string, itemId: string, updateItemDTO: UpdateItemDTO) {
     const cart = await this.getOwnedCart(userId); // Devuelveme el carrito de ese usuario si expiro o no 
     const item = cart.items.find((i) => i.id === itemId); // devuelve items por su id
     if (!item) {
       throw new NotFoundException('Item no encontrado en el carrito');
     }
 
-    item.quantity = updateItemdto.quantity; // asigna la cantidad de items que tenga 
+    item.quantity = updateItemDTO.quantity; // asigna la cantidad de items que tenga 
     await this.cartItemRepository.save(item); // garda el items en la BD donde sea la cantidad igual a la que riene item.quantity
     await this.updateLastActivity(cart.id);
     return this.getCart(userId); // devuelve el carrito modificado con todos sus totales y subtotales
@@ -215,7 +215,7 @@ export class CartService {
   }
 
   // DEVOLVER CARRITO DE UN USARIO EXPESIFICO SI EXPIRO O NO EXPIRO
-  private async getOwnedCart(userId: string): Promise<Cart> {
+  private async getOwnedCart(userId: string): Promise<CartEntity> {
     const cart = await this.cartRepository.findOne({
       where: { userId },
       relations: ['items', 'items.product', 'cupon'],
@@ -229,7 +229,7 @@ export class CartService {
   }
 
   // DEVULVER CARRITO VACIO SI EXPIRO O CON SUS ITEMS SI NO HA EXPIRADO
-  private async handleExpiration(cartEntity: Cart): Promise<Cart> {
+  private async handleExpiration(cartEntity: CartEntity): Promise<CartEntity> {
     const nowDate = new Date(); // fecha actual del servidor en ml
 
     // dif en ml desde ahora hasta la ultima actividad del carrito
@@ -257,7 +257,7 @@ export class CartService {
   }
 
   // TRANSFORMAR EL CARRITO ACTTUAL CON TODOS SUS ITEMS Y PRODUCTOS EN UN JSON ESTRUCTURADO POR TOTALES Y SUBTOTALES
-  private async buildCartResponse(cart: Cart): Promise<CartResponse> {
+  private async buildCartResponse(cart: CartEntity): Promise<CartResponse> {
     let validDiscountPercent = 0;
     let cuponExpirado = false;
     //Si el carrito tiene cupon. cuponCode = code, sino cuponCode = null 

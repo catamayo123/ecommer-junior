@@ -1,25 +1,25 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Category } from './entities/category.entity';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CategoryEntity } from './entities/category.entity';
+import { CreateCategoryDTO } from './DTO/create-category.dto';
+import { UpdateCategoryDTO } from './DTO/update-category.dto';
 
 @Injectable()
 export class CategoriesService {
   constructor(
-    @InjectRepository(Category)
-    private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(CategoryEntity)
+    private readonly categoryRepository: Repository<CategoryEntity>,
   ) {}
 
   // BUSCAR TODAS LAS CATEGORIAS  
-  async findAllCategory(): Promise<Category[]> {
+  async findAllCategory(): Promise<CategoryEntity[]> {
     // find({ relations: ['children'] }); es para que traiga tambien quienes son sus, subcategoria o hijos
     return this.categoryRepository.find({ relations: ['children'] });
   }
 
   // BUSCAR CATEGORIA POR SU NOMBRE Ejemplo progrmacion-js
-  async findCategoryBySlug(slug: string): Promise<Category> {
+  async findCategoryBySlug(slug: string): Promise<CategoryEntity> {
     const category = await this.categoryRepository.findOne({
       where: { slug },
       relations: ['children', 'parent'],
@@ -42,7 +42,7 @@ export class CategoriesService {
   }
   
   // CREAR CATEGORIAS CON UN MISMO FORMATO DE NOMBRE
-  async createCategory(categoryDTO: CreateCategoryDto): Promise<Category> {
+  async createCategory(categoryDTO: CreateCategoryDTO): Promise<CategoryEntity> {
     // convertir el nombre a un solo formato nombre-nombre-nombre.....
     const slug = this.generateSlug(categoryDTO.name);
     
@@ -57,7 +57,7 @@ export class CategoriesService {
   }
 
   // MODIFICAR CATEGORIA
-  async updateCategory(id: string, updateCategoriaDTO: UpdateCategoryDto): Promise<Category> {
+  async updateCategory(id: string, updateCategoriaDTO: UpdateCategoryDTO): Promise<CategoryEntity> {
     const category = await this.categoryRepository.findOne({ where: { id } });
     if (!category) {
       throw new NotFoundException('Categoría no encontrada');

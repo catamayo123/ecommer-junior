@@ -1,20 +1,20 @@
 import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Coupon } from './entities/coupon.entity';
-import { CreateCouponDto } from './dto/create-coupon.dto';
-import { UpdateCouponDto } from './dto/update-coupon.dto';
+import { CouponEntity } from './entities/coupon.entity';
+import { CreateCouponDTO } from './DTO/create-coupon.dto';
+import { UpdateCouponDTO } from './DTO/update-coupon.dto';
 
 @Injectable()
 export class CouponsService {
   constructor(
-    @InjectRepository(Coupon)
-    private readonly couponRepository: Repository<Coupon>,
+    @InjectRepository(CouponEntity)
+    private readonly couponRepository: Repository<CouponEntity>,
   ) {}
 
   // CREAR CUPON
-  async createCoupon(createCouponDto: CreateCouponDto): Promise<Coupon> {
-    const code = createCouponDto.code.toUpperCase();
+  async createCoupon(createCouponDTO: CreateCouponDTO): Promise<CouponEntity> {
+    const code = createCouponDTO.code.toUpperCase();
 
     // existe el cupon con ese codigo ?
     const existingCoupon = await this.couponRepository.findOne({ where: { code } });
@@ -23,22 +23,22 @@ export class CouponsService {
     }
 
     // existe limite de uso y es < 1
-    if (createCouponDto.usageLimit !== undefined && createCouponDto.usageLimit < 1) {
+    if (createCouponDTO.usageLimit !== undefined && createCouponDTO.usageLimit < 1) {
       throw new BadRequestException('El límite de uso debe ser al menos 1');
     }
 
     // Si pasa todas las validaciones crea la instancia del cupon y guardalo en BD
-    const coupon = this.couponRepository.create({ ...createCouponDto, code });
+    const coupon = this.couponRepository.create({ ...createCouponDTO, code });
     return this.couponRepository.save(coupon);
   }
 
   // BUSCAR TODOS LOS CUPONES y mostrar los mas nuevos primeros 
-  async findAllCoupons(): Promise<Coupon[]> {
+  async findAllCoupons(): Promise<CouponEntity[]> {
     return this.couponRepository.find({ order: { createdAt: 'DESC' } });
   }
 
   // BUSCAR CUPON POR ID
-  async findCouponById(id: string): Promise<Coupon> {
+  async findCouponById(id: string): Promise<CouponEntity> {
     const coupon = await this.couponRepository.findOne({ where: { id } });
     if (!coupon) {
       throw new NotFoundException('Cupón no encontrado');
@@ -47,7 +47,7 @@ export class CouponsService {
   }
 
   // BUSCAR CUPON POR CODIGO
-  async findCouponByCode(code: string): Promise<Coupon> {
+  async findCouponByCode(code: string): Promise<CouponEntity> {
     const coupon = await this.couponRepository.findOne({ where: { code: code.toUpperCase() } });
     if (!coupon) {
       throw new NotFoundException('Cupón no encontrado');
@@ -56,11 +56,11 @@ export class CouponsService {
   }
 
   // MODIFICAR CUPON
-  async updateCoupon(id: string, updateCouponDto: UpdateCouponDto): Promise<Coupon> {
+  async updateCoupon(id: string, updateCouponDTO: UpdateCouponDTO): Promise<CouponEntity> {
     const coupon = await this.findCouponById(id);
     // existe cupon que pasaron por parametro y no hay mas ninguno en la BD con ese id ?
-    if (updateCouponDto.code) {
-      const code = updateCouponDto.code.toUpperCase();
+    if (updateCouponDTO.code) {
+      const code = updateCouponDTO.code.toUpperCase();
       const existingCoupon = await this.couponRepository.findOne({ where: { code } });
       if (existingCoupon && existingCoupon.id !== id) {
         throw new ConflictException('Ya existe otro cupón con ese código');
@@ -69,11 +69,11 @@ export class CouponsService {
       coupon.code = code;
     }
 
-    if (updateCouponDto.usageLimit !== undefined && updateCouponDto.usageLimit < 1) {
+    if (updateCouponDTO.usageLimit !== undefined && updateCouponDTO.usageLimit < 1) {
       throw new BadRequestException('El límite de uso debe ser al menos 1');
     }
     // copia el cupon del parametro en el cupon que buscaste en BD y guardalo en el cupon de la BD
-    Object.assign(coupon, updateCouponDto);
+    Object.assign(coupon, updateCouponDTO);
     return this.couponRepository.save(coupon);
   }
 
@@ -86,7 +86,7 @@ export class CouponsService {
   }
 
   // VALIDAR CUPON para poderlo integrar al carrEntity)
-  async validateCoupon(code: string): Promise<{ coupon: Coupon; discountPercent: number }> {
+  async validateCoupon(code: string): Promise<{ coupon: CouponEntity; discountPercent: number }> {
     const coupon = await this.findCouponByCode(code); // busca cupon por codigo 
 
     // si no esta activo excepcion 

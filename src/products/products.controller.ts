@@ -7,9 +7,9 @@ import { UserRole } from '../../enum/index';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { CreateProductDto } from './dto/create-product.dto';
-import { QueryProductDto } from './dto/query-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateProductDTO } from './DTO/create-product.dto';
+import { QueryProductDTO } from './DTO/query-product.dto';
+import { UpdateProductDTO } from './DTO/update-product.dto';
 import { ProductsService } from './products.service';
 
 @Controller('products')
@@ -17,14 +17,14 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) { }
 
   @Get('find')
-  findAllProducts(@Query() queryProductDTO: QueryProductDto) {
+  findAllProducts(@Query() queryProductDTO: QueryProductDTO) {
     return this.productsService.findAllProducts(queryProductDTO);
   }
 
   @Get('adminFindAll')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  findAllProductsAdmin(@Query() query: QueryProductDto) {
+  findAllProductsAdmin(@Query() query: QueryProductDTO) {
     return this.productsService.findAllProductsAdmin(query);
   }
 
@@ -36,15 +36,15 @@ export class ProductsController {
   @Post('create')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  createProduct(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.createProduct(createProductDto);
+  createProduct(@Body() createProductDTO: CreateProductDTO) {
+    return this.productsService.createProduct(createProductDTO);
   }
 
   @Patch('update/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  updateProduct(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsService.updateProduct(id, updateProductDto);
+  updateProduct(@Param('id') id: string, @Body() updateProductDTO: UpdateProductDTO) {
+    return this.productsService.updateProduct(id, updateProductDTO);
   }
 
   @Delete('delete/:id')
@@ -83,7 +83,7 @@ export class ProductsController {
       throw new BadRequestException('Debes subir una imagen');
     }
     const coverPath = `uploads/portadas/${file.filename}`;
-    return this.productsService.updateProduct(id, { coverImage: coverPath } as UpdateProductDto);
+    return this.productsService.updateProduct(id, { coverImage: coverPath } as UpdateProductDTO);
   }
 
   // GUARDAR ARCHIVO
@@ -109,6 +109,6 @@ export class ProductsController {
       throw new BadRequestException('Debes subir un archivo');
     }
     // se guarda SOLO el nombre del archivo (los archivos pagados son privados, no se expone la ruta)
-    return this.productsService.updateProduct(id, { fileName: file.filename } as UpdateProductDto);
+    return this.productsService.updateProduct(id, { fileName: file.filename } as UpdateProductDTO);
   }
 }

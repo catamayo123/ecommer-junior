@@ -1,6 +1,6 @@
 import { IsString, IsNumber, IsOptional, IsBoolean, MinLength, MaxLength, Min, Max } from 'class-validator';
 
-export class CreateCouponDto {
+export class CreateCouponDTO {
   @IsString()
   @MinLength(3)
   @MaxLength(50)

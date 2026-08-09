@@ -4,7 +4,7 @@ import { Type } from 'class-transformer';
 import { IsEnum, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 import { ProductType } from '../../../enum/index';
 
-export class QueryProductDto {
+export class QueryProductDTO {
   @IsOptional()
   @IsString()
   searchName?: string;

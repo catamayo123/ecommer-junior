@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, CreateDateColumn } from 'typeorm';
 
 @Entity('categories')
-export class Category {
+export class CategoryEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -16,13 +16,13 @@ export class Category {
   parentId!: string;
 
   // Muchas subcategorias pertencen a una sola categoria 
-  @ManyToOne(() => Category, (category) => category.children, { nullable: true })
+  @ManyToOne(() => CategoryEntity, (category) => category.children, { nullable: true })
   @JoinColumn({ name: 'parentId' })
-  parent!: Category;
+  parent!: CategoryEntity;
 
   // Una cageria tiene muchas subcategorias 
-  @OneToMany(() => Category, (category) => category.parent)
-  children!: Category[];
+  @OneToMany(() => CategoryEntity, (category) => category.parent)
+  children!: CategoryEntity[];
 
   @CreateDateColumn()
   createdAt!: Date;

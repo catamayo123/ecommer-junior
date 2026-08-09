@@ -1,9 +1,9 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { ProductType } from '../../../enum/index';
-import { Category } from '../../categories/entities/category.entity';
+import { CategoryEntity } from '../../categories/entities/category.entity';
 
 @Entity('products')
-export class Product {
+export class ProductEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -42,9 +42,9 @@ export class Product {
   categoryId!: string;
 
   // Muchos productos pertenecen a una categoria
-  @ManyToOne(() => Category, { nullable: true })
+  @ManyToOne(() => CategoryEntity, { nullable: true })
   @JoinColumn({ name: 'categoryId' })
-  category!: Category;
+  category!: CategoryEntity;
 
   @CreateDateColumn()
   createdAt!: Date;

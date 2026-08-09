@@ -4,21 +4,21 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { existsSync } from 'fs';
 import { basename, join } from 'path';
 import { Repository } from 'typeorm';
-import { OrderItem } from '../order/entities/order-item.entity';
-import { Order } from '../order/entities/order.entity';
-import { Payment } from '../payment/entities/payment.entity';
+import { OrderItemEntity } from '../order/entities/order-item.entity';
+import { OrderEntity } from '../order/entities/order.entity';
+import { PaymentEntity } from '../payment/entities/payment.entity';
 import { IBaseICourseAndIBook, ICourses, IeBooks } from './interfaces/downloads.interface';
 import { OrderStatus, PaymentStatus, ProductType } from '../../enum';
 
 @Injectable()
 export class DownloadsService {
 	constructor(
-		@InjectRepository(Order)
-		private readonly orderRepository: Repository<Order>,
-		@InjectRepository(OrderItem)
-		private readonly OrderItemRepository: Repository<OrderItem>,
-		@InjectRepository(Payment)
-		private readonly paymentRepository: Repository<Payment>,
+		@InjectRepository(OrderEntity)
+		private readonly orderRepository: Repository<OrderEntity>,
+		@InjectRepository(OrderItemEntity)
+		private readonly OrderItemRepository: Repository<OrderItemEntity>,
+		@InjectRepository(PaymentEntity)
+		private readonly paymentRepository: Repository<PaymentEntity>,
 		private readonly jwtService: JwtService
 	) { }
 
@@ -213,7 +213,7 @@ export class DownloadsService {
 	/* 	
 		verificando que exista, pertenezca al usuario y que su orden este completada
 	*/
-	private async findOwnedItem(userId: string, orderItemId: string): Promise<OrderItem> {
+	private async findOwnedItem(userId: string, orderItemId: string): Promise<OrderItemEntity> {
 		const item = await this.OrderItemRepository.findOne({
 			where: { id: orderItemId },
 			relations: ['order', 'product']
@@ -235,7 +235,7 @@ export class DownloadsService {
 		verificando que exista, pertenezca al usuario, que su orden este completada 
 		y que el producto sea un eBook
 	*/
-	private async findOwnedEbookItem(userId: string, orderItemId: string, ebookMessage: string): Promise<OrderItem> {
+	private async findOwnedEbookItem(userId: string, orderItemId: string, ebookMessage: string): Promise<OrderItemEntity> {
 		const item = await this.findOwnedItem(userId, orderItemId);
 
 		if (item.product.productType !== ProductType.EBOOK) {

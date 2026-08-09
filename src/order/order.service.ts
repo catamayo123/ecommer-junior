@@ -3,20 +3,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrderStatus, PaymentStatus } from '../../enum/index';
 import { CartService } from '../cart/cart.service';
-import { Payment } from '../payment/entities/payment.entity';
-import { OrderItem } from './entities/order-item.entity';
-import { Order } from './entities/order.entity';
+import { PaymentEntity } from '../payment/entities/payment.entity';
+import { OrderItemEntity } from './entities/order-item.entity';
+import { OrderEntity } from './entities/order.entity';
 
 @Injectable()
 export class OrderService {
     constructor(
-        @InjectRepository(Order)
-        private readonly orderRepository: Repository<Order>,
+        @InjectRepository(OrderEntity)
+        private readonly orderRepository: Repository<OrderEntity>,
         private readonly cartService: CartService,
-        @InjectRepository(OrderItem)
-        private readonly orderItemRepository: Repository<OrderItem>,
-        @InjectRepository(Payment)
-        private readonly paymentRepository: Repository<Payment>,
+        @InjectRepository(OrderItemEntity)
+        private readonly orderItemRepository: Repository<OrderItemEntity>,
+        @InjectRepository(PaymentEntity)
+        private readonly paymentRepository: Repository<PaymentEntity>,
     ) { }
 
     // CREAR ORDEN. QUE HACE ?

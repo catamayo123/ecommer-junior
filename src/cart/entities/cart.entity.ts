@@ -1,10 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany, JoinColumn, CreateDateColumn, ManyToOne } from 'typeorm';
 import { UserEntity } from '../../users/entities/user.entity';
-import { CartItem } from './cart-item.entity';
-import { Coupon } from '../../coupons/entities/coupon.entity';
+import { CartItemEntity } from './cart-item.entity';
+import { CouponEntity } from '../../coupons/entities/coupon.entity';
 
 @Entity('carts')
-export class Cart {
+export class CartEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -25,13 +25,13 @@ export class Cart {
   user!: UserEntity;
 
   // Un carriro tiene muchos items 
-  @OneToMany(() => CartItem, (item) => item.cart, { cascade: true })
-  items!: CartItem[];
+  @OneToMany(() => CartItemEntity, (item) => item.cart, { cascade: true })
+  items!: CartItemEntity[];
 
   // Un carrito tiene o no, muchos cupones 
-  @ManyToOne(() => Coupon)
+  @ManyToOne(() => CouponEntity)
   @JoinColumn({name: 'couponId'})
-  cupon!: Coupon | null;
+  cupon!: CouponEntity | null;
 
   @CreateDateColumn()
   createdAt!: Date;
