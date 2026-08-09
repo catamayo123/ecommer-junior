@@ -2,6 +2,7 @@ import { BadRequestException, ConflictException, Injectable, NotFoundException }
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
 import { Repository } from 'typeorm';
+import { OrderService } from '../order/order.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UserEntity } from './entities/user.entity';
 
@@ -10,6 +11,7 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    private readonly orderService: OrderService
   ) { }
 
   // BUSCAR EMAIL 
@@ -85,26 +87,30 @@ export class UsersService {
     }
 
     // si cambia el nombre solamente 
-    if(data.name && data.name !== user.name){
-      await this.updateUser(id, {name: data.name})
+    if (data.name && data.name !== user.name) {
+      await this.updateUser(id, { name: data.name })
     }
 
     return this.getProfile(id);
   }
 
   // CAMBIAR PASS
-  async changePassword(id: string, currentPass: string, newPass: string){
+  async changePassword(id: string, currentPass: string, newPass: string) {
     const user = await this.findUserById(id)
 
-    if(!user) throw new NotFoundException('Usuario no encontrado')
+    if (!user) throw new NotFoundException('Usuario no encontrado')
 
     const isValid = await bcrypt.compare(currentPass, user.password);
     if (!isValid) throw new BadRequestException('El pass no concide')
-    
+
     const hashedNewPass = await bcrypt.hash(newPass, 10);
-    await this.updateUser(id, {password: hashedNewPass})
-    return {message: 'Password actualziado correctamente'}
+    await this.updateUser(id, { password: hashedNewPass })
+    return { message: 'Password actualziado correctamente' }
   }
 
   // HISTORIAL DE ORDENES 
+  async getOrderHistory(userId: string){
+    return this.orderService.findAllOrder(userId)
+  }
+  
 }

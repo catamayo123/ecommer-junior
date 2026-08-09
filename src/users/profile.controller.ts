@@ -18,12 +18,18 @@ export class ProfileController {
         return this.userService.getProfile(userId)
     }
 
+    // HISTORIAL DE ORDENES CON SUS ITEMS Y RELACIONES
+    @Get('OrderHistory')
+    getOrderHistory(@CurrentUser('id') userId: string){
+        return this.userService.getOrderHistory(userId)
+    }
+    
     // EDITAR PERFIL DEL USUARIO
     @Patch('updateProfile')
     updateProfile(@CurrentUser('id') userId: string, @Body() data: UpdateProfileDto) {
         return this.userService.updateProfile(userId, data)
     }
-
+    // CAMBIAR PASS
     @Patch('changePass')
     changePassword(@CurrentUser('id') userId: string, @Body() data: ChangePasswordDto){
         return this.userService.changePassword(userId, data.currentPass, data.newPass)
