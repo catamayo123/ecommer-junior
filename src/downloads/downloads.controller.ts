@@ -4,6 +4,7 @@ import { UserRole } from '../../enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { DownloadsService } from './downloads.service';
 
 @Controller('downloads')
@@ -50,7 +51,7 @@ export class DownloadsController {
 
 	// ADMIN CONFIRMA Y PAGA LA RENOVACION
 	@Patch('payRenewal/:paymentId/:orderItemId')
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, RolesGuard)
 	@Roles(UserRole.ADMIN)
 	payRenewal(
 		@Param('paymentId') paymentId: string,

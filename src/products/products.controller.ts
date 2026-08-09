@@ -6,6 +6,7 @@ import { extname, join } from 'path';
 import { UserRole } from '../../enum/index';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreateProductDto } from './dto/create-product.dto';
 import { QueryProductDto } from './dto/query-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -21,7 +22,7 @@ export class ProductsController {
   }
 
   @Get('adminFindAll')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   findAllProductsAdmin(@Query() query: QueryProductDto) {
     return this.productsService.findAllProductsAdmin(query);
@@ -33,21 +34,21 @@ export class ProductsController {
   }
 
   @Post('create')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   createProduct(@Body() createProductDto: CreateProductDto) {
     return this.productsService.createProduct(createProductDto);
   }
 
   @Patch('update/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   updateProduct(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productsService.updateProduct(id, updateProductDto);
   }
 
   @Delete('delete/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   removeProduct(@Param('id') id: string) {
     return this.productsService.removeProduct(id);
@@ -55,7 +56,7 @@ export class ProductsController {
 
   // GUARDAR PORTADA
   @Post('upload-cover/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   // INTERCEPTOR para (validar, generar nombre aleatorio, guardar HDD los archivos)
   @UseInterceptors(FileInterceptor('coverImage', {
@@ -87,7 +88,7 @@ export class ProductsController {
 
   // GUARDAR ARCHIVO
   @Post('upload-file/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({

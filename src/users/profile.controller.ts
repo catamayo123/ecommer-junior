@@ -13,7 +13,7 @@ export class ProfileController {
     ) { }
 
     // VER PERFIL DEL USUARIO 
-    @Get('profile')
+    @Get('seeProfile')
     getProfile(@CurrentUser('id') userId: string) {
         return this.userService.getProfile(userId)
     }
@@ -24,7 +24,7 @@ export class ProfileController {
         return this.userService.updateProfile(userId, data)
     }
 
-    @Patch('profilePass')
+    @Patch('changePass')
     changePassword(@CurrentUser('id') userId: string, @Body() data: ChangePasswordDto){
         return this.userService.changePassword(userId, data.currentPass, data.newPass)
     }

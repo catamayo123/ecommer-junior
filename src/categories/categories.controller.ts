@@ -3,6 +3,7 @@ import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../../enum/index';
 
@@ -21,7 +22,7 @@ export class CategoriesController {
   }
   // CREAR CAT (SOLO ADMIN)
   @Post('createdCat')
-  @UseGuards(JwtAuthGuard) // necesita autenticacion JWT para ser creada la cat 
+  @UseGuards(JwtAuthGuard, RolesGuard) // necesita autenticacion JWT para ser creada la cat 
   @Roles(UserRole.ADMIN)  // Tienes que ser rol admin para poder crearla cat
   createCategory(@Body() createDto: CreateCategoryDto) {
     return this.categoriesService.createCategory(createDto);
@@ -29,7 +30,7 @@ export class CategoriesController {
 
   // MODIFICAR (SOLO ADMIN)
   @Patch('update/:id')
-  @UseGuards(JwtAuthGuard) 
+  @UseGuards(JwtAuthGuard, RolesGuard) 
   @Roles(UserRole.ADMIN)
   updateCategory(@Param('id') id: string, @Body() updatedto: UpdateCategoryDto) {
     return this.categoriesService.updateCategory(id, updatedto);
@@ -37,7 +38,7 @@ export class CategoriesController {
 
   // ELIMINAR (SOLO ADMIN)
   @Delete('delete/:id') 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   removeCategory(@Param('id') id: string) {
     return this.categoriesService.removeCategory(id);

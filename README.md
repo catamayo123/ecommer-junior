@@ -1,4 +1,4 @@
-1 - FEATURES DEL PROYECTO
+1 - FEATURES DEL PROYECTO 
 
 Productos: Cursos + eBooks (digitales)
 
@@ -10,7 +10,7 @@ Carrito: Persistente en DB, expira 30 días sin actividad, priceAtPurchase y tot
 
 Pago: Simulado (admin marca como pagado), entidad PAYMENT separada (OneToOne con Order)
 
-Órdenes: Pendiente → Pagado → Completado → Descargado / Cancelado → Reembolsado. ORDER_ITEM congela precio y genera downloadToken JWT 24h
+Órdenes: Pendiente → Completado → Cancelado → Reembolsado. ORDER_ITEM congela precio y genera downloadToken JWT 24h
 
 Categorías: Jerárquicas (padre → hijo con parentId)
 
@@ -39,7 +39,7 @@ Seguridad: Parámetros vinculados (previene SQL injection), lista blanca para or
 Admin: Mismos endpoints + @Roles(UserRole.ADMIN), paginación y filtros también disponibles para admin en /api/products/admin/all
 
 2 - FASES DEL PROYECTO
-FASE 1 — Core
+FASE 1 — Core ( LISTO )
 
 •	ConfigModule + TypeORM + PostgreSQL + ServeStaticModule
 
@@ -59,7 +59,7 @@ FASE 1 — Core
 
 •	Carpetas uploads/portadas y uploads/archivos
 
-FASE 2 — Carrito y Órdenes (pendiente)
+FASE 2 — Carrito y Órdenes (pendiente ReviewsModule)
 
 •	CartModule — Carrito persistente (CRUD, expiración 30 días, priceAtPurchase, totales vivos)
 
@@ -71,7 +71,7 @@ FASE 2 — Carrito y Órdenes (pendiente)
 
 •	ReviewsModule — Crear reseña (requiere compra completada), listar por producto, admin puede eliminar
 
-FASE 3 — Perfil y UX (pendiente)
+FASE 3 — Perfil y UX (pendiente WishlistModule)
 
 •	ProfileModule — Ver/editar perfil propio, cambiar contraseña, historial de órdenes
 

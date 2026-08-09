@@ -23,6 +23,8 @@ async function bootstrap() {
     .build();
   // para la subida de archivos 
   const document = SwaggerModule.createDocument(app, config);
+  // aplicar el esquema bearer a TODOS los endpoints para que Swagger UI envíe el token
+  document.security = [{ bearer: [] }];
   SwaggerModule.setup('api', app, document);
   
   await app.listen(process.env.PORT ?? 3000);
