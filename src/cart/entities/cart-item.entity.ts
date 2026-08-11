@@ -7,7 +7,7 @@ export class CartItemEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  // FK del carrito 
+  // FK del carrito
   @Column({ type: 'uuid' })
   cartId!: string;
 
@@ -23,12 +23,12 @@ export class CartItemEntity {
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   appliedDiscount!: number;
-  
-  // muchos items pertencen a un carrito 
+
+  // muchos items pertencen a un carrito
   @ManyToOne(() => CartEntity, (cart) => cart.items, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'cartId' })
   cart!: CartEntity;
-  
+
   // Muchos productos pertenecen a un carrito
   @ManyToOne(() => ProductEntity)
   @JoinColumn({ name: 'productId' })

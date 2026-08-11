@@ -1,4 +1,17 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
@@ -14,7 +27,7 @@ import { ProductsService } from './products.service';
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) { }
+  constructor(private readonly productsService: ProductsService) {}
 
   @Get('find')
   findAllProducts(@Query() queryProductDTO: QueryProductDTO) {
@@ -59,24 +72,29 @@ export class ProductsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   // INTERCEPTOR para (validar, generar nombre aleatorio, guardar HDD los archivos)
-  @UseInterceptors(FileInterceptor('coverImage', {
-    storage: diskStorage({                                              // guardar archivo en el HDD y no en memoria
-      destination: join(__dirname, '..', '..', 'uploads', 'portadas'),  // ubucacion donde se guardara el archivo 
+  @UseInterceptors(
+    FileInterceptor('coverImage', {
+      storage: diskStorage({
+        // guardar archivo en el HDD y no en memoria
+        destination: join(__dirname, '..', '..', 'uploads', 'portadas'), // ubucacion donde se guardara el archivo
 
-      filename: (req, file, cb) => {                                    // funcion para generar el nombre del archivo
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9); // Milisegundos actuales + un numero rando de 9 digitos
-        cb(null, uniqueSuffix + extname(file.originalname)); // nombre generado + extension original del archivo
+        filename: (req, file, cb) => {
+          // funcion para generar el nombre del archivo
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9); // Milisegundos actuales + un numero rando de 9 digitos
+          cb(null, uniqueSuffix + extname(file.originalname)); // nombre generado + extension original del archivo
+        },
+      }),
+      // validar el tipo de archivo antes de guardarlo
+      fileFilter: (req, file, cb) => {
+        if (!file.mimetype.match(/^image\/(jpeg|png|webp|gif)$/)) {
+          // Regex que solo acepta tipos que empiecen con image/ y terminen en jpeg, png, webp o gif
+          cb(new BadRequestException('Solo se permiten imágenes (JPEG, PNG, WebP, GIF)'), false);
+        } else {
+          cb(null, true); // si el cb anterior no lanza error, permite guardar el archivo
+        }
       },
     }),
-    // validar el tipo de archivo antes de guardarlo 
-    fileFilter: (req, file, cb) => {
-      if (!file.mimetype.match(/^image\/(jpeg|png|webp|gif)$/)) {   // Regex que solo acepta tipos que empiecen con image/ y terminen en jpeg, png, webp o gif
-        cb(new BadRequestException('Solo se permiten imágenes (JPEG, PNG, WebP, GIF)'), false);
-      } else {
-        cb(null, true); // si el cb anterior no lanza error, permite guardar el archivo 
-      }
-    },
-  }))
+  )
   // Funcion para cargar la imagen en el parametro File despues que UseInterceptors(FileInterceptor) hizo su trabajo
   async uploadCover(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
     if (!file) {
@@ -90,20 +108,22 @@ export class ProductsController {
   @Post('upload-file/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      // carpeta privada FUERA de /uploads para que NO sea accesible por el servidor estatico
-      destination: (req, file, cb) => {
-        const dir = join(__dirname, '..', '..', 'private-files', 'productos');
-        mkdirSync(dir, { recursive: true });
-        cb(null, dir);
-      },
-      filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        cb(null, uniqueSuffix + extname(file.originalname));
-      },
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        // carpeta privada FUERA de /uploads para que NO sea accesible por el servidor estatico
+        destination: (req, file, cb) => {
+          const dir = join(__dirname, '..', '..', 'private-files', 'productos');
+          mkdirSync(dir, { recursive: true });
+          cb(null, dir);
+        },
+        filename: (req, file, cb) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, uniqueSuffix + extname(file.originalname));
+        },
+      }),
     }),
-  }))
+  )
   async uploadFile(@Param('id') id: string, @UploadedFile() file: Express.Multer.File) {
     if (!file) {
       throw new BadRequestException('Debes subir un archivo');

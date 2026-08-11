@@ -10,33 +10,33 @@ import { ReviewsService } from './reviews.service';
 
 @Controller('reviews')
 export class ReviewsController {
-	constructor(private readonly reviewsService: ReviewsService) { }
+  constructor(private readonly reviewsService: ReviewsService) {}
 
-	// CREAR RESEÑA
-	@Post('crear')
-	@UseGuards(JwtAuthGuard)
-	createReview(@CurrentUser('id') userId: string, @Body() creteDTO: CreateReviewDTO) {
-		return this.reviewsService.createReview(userId, creteDTO)
-	}
+  // CREAR RESEÑA
+  @Post('crear')
+  @UseGuards(JwtAuthGuard)
+  createReview(@CurrentUser('id') userId: string, @Body() creteDTO: CreateReviewDTO) {
+    return this.reviewsService.createReview(userId, creteDTO);
+  }
 
-	// LISTAR RESEÑAS POR PRODUCTID
-	@Get('product/:productId')
-	finAllReviewByProduct(@Param('productId') productId: string) {
-		return this.reviewsService.finAllReviewByProduct(productId)
-	}
+  // LISTAR RESEÑAS POR PRODUCTID
+  @Get('product/:productId')
+  finAllReviewByProduct(@Param('productId') productId: string) {
+    return this.reviewsService.finAllReviewByProduct(productId);
+  }
 
-	// MODIFICAR RESEÑAS
-	@Patch('update/:id')
-	@UseGuards(JwtAuthGuard)
-	updateReview(@CurrentUser('id') userId: string, @Param('id') id: string, updateDTO: UpdateReviewDTO) {
-		return this.reviewsService.updateReview(userId, id, updateDTO)
-	}
+  // MODIFICAR RESEÑAS
+  @Patch('update/:id')
+  @UseGuards(JwtAuthGuard)
+  updateReview(@CurrentUser('id') userId: string, @Param('id') id: string, updateDTO: UpdateReviewDTO) {
+    return this.reviewsService.updateReview(userId, id, updateDTO);
+  }
 
-	// DELETE RESEÑAS
-	@Delete('delete/:id')
-	@UseGuards(JwtAuthGuard, RolesGuard)
-	@Roles(UserRole.ADMIN)
-	deleteReview(@Param('id') id: string) {
-		return this.reviewsService.deleteReview(id)
-	}
+  // DELETE RESEÑAS
+  @Delete('delete/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  deleteReview(@Param('id') id: string) {
+    return this.reviewsService.deleteReview(id);
+  }
 }

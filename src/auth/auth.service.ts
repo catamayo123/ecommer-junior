@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, UnauthorizedException, BadRequestException,} from '@nestjs/common';
+import { Injectable, ConflictException, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/users.service';
@@ -20,7 +20,7 @@ export class AuthService {
       // Las excepciones que se manejan aca son propias de nest JS
       throw new ConflictException('El email ya está siendo usado por otro usuario');
     }
-    
+
     // se coloca 10 por defecto para que sean 4 seg
     const hashedPassword = await bcrypt.hash(registerDTO.password, 10);
 
@@ -66,15 +66,15 @@ export class AuthService {
 
     return { message: 'Email verificado exitosamente' };
   }
-  
+
   // LOGUEARSE: COMPLIDO LOS PASOS ANTERIORES VERIFICAR
   async login(userLoginDTO: LoginDTO) {
     const user = await this.usersService.findUserByEmail(userLoginDTO.email);
-    // valdiar que exista el usuario con ese correo 
+    // valdiar que exista el usuario con ese correo
     if (!user) {
       throw new UnauthorizedException('Credenciales inválidas');
     }
-    // valdiar que el pass sea correcto contra el pass hasheado de la BD 
+    // valdiar que el pass sea correcto contra el pass hasheado de la BD
     const passValid = await bcrypt.compare(userLoginDTO.password, user.password);
     if (!passValid) {
       throw new UnauthorizedException('Credenciales inválidas');

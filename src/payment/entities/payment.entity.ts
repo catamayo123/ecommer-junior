@@ -5,7 +5,6 @@ import { UserEntity } from '../../users/entities/user.entity';
 
 @Entity('payments')
 export class PaymentEntity {
-
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 

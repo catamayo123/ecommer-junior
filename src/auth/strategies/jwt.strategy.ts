@@ -10,8 +10,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     configService: ConfigService, // recibe ConfigService para leer el .dev.env del pryecto
     private readonly usersService: UsersService, // y recibe UsersService para buscar al usuario en la BD cuando llegue un token
   ) {
-
-    // validar en el PassportStrategy que se cumplan las condiciones siguientes 
+    // validar en el PassportStrategy que se cumplan las condiciones siguientes
 
     /*
      operaciones que se realizan para validarlo 
@@ -25,14 +24,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     */
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Buscar el token en el header Authorization: Bearer EL_TOKEN
-      ignoreExpiration: false,                                  // Rechazar tokens vencidos a los de 30 días como se definio
-      secretOrKey: configService.get<string>('JWT_SECRET')!,    // clave que esta en .dev.env
+      ignoreExpiration: false, // Rechazar tokens vencidos a los de 30 días como se definio
+      secretOrKey: configService.get<string>('JWT_SECRET')!, // clave que esta en .dev.env
     });
   }
   // decidir si el usuario puede pasar o no después de que el token es válidado en el super con PassportStrategy
   async validate(payload: { sub: string; email: string; role: string }) {
     // Busca al usuario en la BD por payload.sub (el ID del usuario)
-    const user = await this.usersService.findUserById(payload.sub); 
+    const user = await this.usersService.findUserById(payload.sub);
     // Si no existe return null, status = 401
     if (!user) {
       return null;

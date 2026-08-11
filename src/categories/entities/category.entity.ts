@@ -11,16 +11,16 @@ export class CategoryEntity {
   @Column({ type: 'varchar', length: 150, unique: true })
   slug!: string;
 
-  // FK de la relacion entre las categorias y las subcategorias 
+  // FK de la relacion entre las categorias y las subcategorias
   @Column({ type: 'uuid', nullable: true })
   parentId!: string;
 
-  // Muchas subcategorias pertencen a una sola categoria 
+  // Muchas subcategorias pertencen a una sola categoria
   @ManyToOne(() => CategoryEntity, (category) => category.children, { nullable: true })
   @JoinColumn({ name: 'parentId' })
   parent!: CategoryEntity;
 
-  // Una cageria tiene muchas subcategorias 
+  // Una cageria tiene muchas subcategorias
   @OneToMany(() => CategoryEntity, (category) => category.parent)
   children!: CategoryEntity[];
 

@@ -14,10 +14,10 @@ import { CartEntity } from './entities/cart.entity';
     TypeOrmModule.forFeature([CartEntity, CartItemEntity, ProductEntity]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     ScheduleModule.forRoot(),
-    CouponsModule
+    CouponsModule,
   ],
   controllers: [CartController],
   providers: [CartService],
-  exports: [CartService],  
+  exports: [CartService],
 })
-export class CartModule { }
+export class CartModule {}

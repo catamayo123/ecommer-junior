@@ -8,31 +8,28 @@ import { ChangePasswordDTO } from './DTO/change-password.dto';
 @Controller('profile')
 @UseGuards(JwtAuthGuard)
 export class ProfileController {
-    constructor(
-        private readonly userService: UsersService
-    ) { }
+  constructor(private readonly userService: UsersService) {}
 
-    // VER PERFIL DEL USUARIO 
-    @Get('seeProfile')
-    getProfile(@CurrentUser('id') userId: string) {
-        return this.userService.getProfile(userId)
-    }
+  // VER PERFIL DEL USUARIO
+  @Get('seeProfile')
+  getProfile(@CurrentUser('id') userId: string) {
+    return this.userService.getProfile(userId);
+  }
 
-    // HISTORIAL DE ORDENES CON SUS ITEMS Y RELACIONES
-    @Get('OrderHistory')
-    getOrderHistory(@CurrentUser('id') userId: string){
-        return this.userService.getOrderHistory(userId)
-    }
-    
-    // EDITAR PERFIL DEL USUARIO
-    @Patch('updateProfile')
-    updateProfile(@CurrentUser('id') userId: string, @Body() data: UpdateProfileDTO) {
-        return this.userService.updateProfile(userId, data)
-    }
-    // CAMBIAR PASS
-    @Patch('changePass')
-    changePassword(@CurrentUser('id') userId: string, @Body() data: ChangePasswordDTO){
-        return this.userService.changePassword(userId, data.currentPass, data.newPass)
-    }
+  // HISTORIAL DE ORDENES CON SUS ITEMS Y RELACIONES
+  @Get('OrderHistory')
+  getOrderHistory(@CurrentUser('id') userId: string) {
+    return this.userService.getOrderHistory(userId);
+  }
 
+  // EDITAR PERFIL DEL USUARIO
+  @Patch('updateProfile')
+  updateProfile(@CurrentUser('id') userId: string, @Body() data: UpdateProfileDTO) {
+    return this.userService.updateProfile(userId, data);
+  }
+  // CAMBIAR PASS
+  @Patch('changePass')
+  changePassword(@CurrentUser('id') userId: string, @Body() data: ChangePasswordDTO) {
+    return this.userService.changePassword(userId, data.currentPass, data.newPass);
+  }
 }

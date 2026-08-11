@@ -13,6 +13,6 @@ import { OrderItemEntity } from '../order/entities/order-item.entity';
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   controllers: [ReviewsController],
-  providers: [ReviewsService]
-})  
-export class ReviewsModule { }
+  providers: [ReviewsService],
+})
+export class ReviewsModule {}

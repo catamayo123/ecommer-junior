@@ -5,7 +5,7 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api') // todas las rutas comenzaran con api/ lo que venga
+  app.setGlobalPrefix('api'); // todas las rutas comenzaran con api/ lo que venga
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -14,19 +14,19 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  // para usar el nav en vez de postman para hacer las peticiones y demas 
+  // para usar el nav en vez de postman para hacer las peticiones y demas
   const config = new DocumentBuilder()
     .setTitle('Ecommerce API Digital')
     .setDescription('API de productos digitales (cursos y ebooks)')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
-  // para la subida de archivos 
+  // para la subida de archivos
   const document = SwaggerModule.createDocument(app, config);
   // aplicar el esquema bearer a TODOS los endpoints para que Swagger UI envíe el token
   document.security = [{ bearer: [] }];
   SwaggerModule.setup('api', app, document);
-  
+
   await app.listen(process.env.PORT ?? 3000);
   console.log(`La app esta se esta ejecutando en: http://localhost:${process.env.PORT ?? 3000}/api`);
 }

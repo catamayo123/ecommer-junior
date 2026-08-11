@@ -7,23 +7,23 @@ import { WishListService } from './wish-list.service';
 @Controller('wish-list')
 @UseGuards(JwtAuthGuard)
 export class WishListController {
-	constructor(private readonly wishListService: WishListService) { }
+  constructor(private readonly wishListService: WishListService) {}
 
-	// CREAR RESEÑA
-	@Post('crear')
-	createReview(@CurrentUser('id') userId: string, @Body() creteDTO: CreateWhishListDTO) {
-		return this.wishListService.createWishList(userId, creteDTO)
-	}
+  // CREAR RESEÑA
+  @Post('crear')
+  createReview(@CurrentUser('id') userId: string, @Body() creteDTO: CreateWhishListDTO) {
+    return this.wishListService.createWishList(userId, creteDTO);
+  }
 
-	// LISTAR RESEÑAS POR PRODUCTID
-	@Get('findAll')
-	finAllReviewByProduct(@CurrentUser('id') userId: string) {
-		return this.wishListService.findALLWishList(userId)
-	}
+  // LISTAR RESEÑAS POR PRODUCTID
+  @Get('findAll')
+  finAllReviewByProduct(@CurrentUser('id') userId: string) {
+    return this.wishListService.findALLWishList(userId);
+  }
 
-	// DELETE RESEÑAS
-		@Delete('delete/:id')
-		deleteReview(@Param('id') id: string, @CurrentUser('id') userId: string) {
-			return this.wishListService.deleteWishList(id, userId)
-		}
+  // DELETE RESEÑAS
+  @Delete('delete/:id')
+  deleteReview(@Param('id') id: string, @CurrentUser('id') userId: string) {
+    return this.wishListService.deleteWishList(id, userId);
+  }
 }

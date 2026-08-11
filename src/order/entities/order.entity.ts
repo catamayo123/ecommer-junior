@@ -1,4 +1,13 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { OrderStatus } from '../../../enum/index';
 import { PaymentEntity } from '../../payment/entities/payment.entity';
 import { UserEntity } from '../../users/entities/user.entity';
@@ -6,7 +15,6 @@ import { OrderItemEntity } from './order-item.entity';
 
 @Entity('orders')
 export class OrderEntity {
-
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -38,7 +46,7 @@ export class OrderEntity {
   @OneToMany(() => OrderItemEntity, (item) => item.order, { cascade: true })
   items!: OrderItemEntity[];
 
-  // Una orden tiene un pago 
+  // Una orden tiene un pago
   @OneToOne(() => PaymentEntity, (payment) => payment.order)
   payment!: PaymentEntity;
 

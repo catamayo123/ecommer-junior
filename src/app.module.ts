@@ -15,7 +15,6 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { UsersModule } from './users/users.module';
 import { WishListModule } from './wish-list/wish-list.module';
 
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -57,9 +56,6 @@ import { WishListModule } from './wish-list/wish-list.module';
     DownloadsModule,
     ReviewsModule,
     WishListModule,
-
   ],
- 
-
 })
-export class AppModule { }
+export class AppModule {}

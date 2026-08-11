@@ -6,10 +6,7 @@ import { ProductsController } from './products.controller';
 import { ProductEntity } from './entities/product.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([ProductEntity]),
-    PassportModule.register({ defaultStrategy: 'jwt' }),
-  ],
+  imports: [TypeOrmModule.forFeature([ProductEntity]), PassportModule.register({ defaultStrategy: 'jwt' })],
   providers: [ProductsService],
   controllers: [ProductsController],
 })

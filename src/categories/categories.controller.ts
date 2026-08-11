@@ -10,7 +10,7 @@ import { UserRole } from '../../enum/index';
 @Controller('categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
-  // BUSCAR TODOS 
+  // BUSCAR TODOS
   @Get('findAll')
   findAllCategory() {
     return this.categoriesService.findAllCategory();
@@ -22,22 +22,22 @@ export class CategoriesController {
   }
   // CREAR CAT (SOLO ADMIN)
   @Post('createdCat')
-  @UseGuards(JwtAuthGuard, RolesGuard) // necesita autenticacion JWT para ser creada la cat 
-  @Roles(UserRole.ADMIN)  // Tienes que ser rol admin para poder crearla cat
+  @UseGuards(JwtAuthGuard, RolesGuard) // necesita autenticacion JWT para ser creada la cat
+  @Roles(UserRole.ADMIN) // Tienes que ser rol admin para poder crearla cat
   createCategory(@Body() createDTO: CreateCategoryDTO) {
     return this.categoriesService.createCategory(createDTO);
   }
 
   // MODIFICAR (SOLO ADMIN)
   @Patch('update/:id')
-  @UseGuards(JwtAuthGuard, RolesGuard) 
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   updateCategory(@Param('id') id: string, @Body() updateDTO: UpdateCategoryDTO) {
     return this.categoriesService.updateCategory(id, updateDTO);
   }
 
   // ELIMINAR (SOLO ADMIN)
-  @Delete('delete/:id') 
+  @Delete('delete/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   removeCategory(@Param('id') id: string) {

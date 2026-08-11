@@ -12,7 +12,7 @@ export class CategoriesService {
     private readonly categoryRepository: Repository<CategoryEntity>,
   ) {}
 
-  // BUSCAR TODAS LAS CATEGORIAS  
+  // BUSCAR TODAS LAS CATEGORIAS
   async findAllCategory(): Promise<CategoryEntity[]> {
     // find({ relations: ['children'] }); es para que traiga tambien quienes son sus, subcategoria o hijos
     return this.categoryRepository.find({ relations: ['children'] });
@@ -31,27 +31,27 @@ export class CategoriesService {
     return category;
   }
 
-  // BUSCA HOMEGENEIDAD EN EL NOMBRE DE LA CATEGORIA 
+  // BUSCA HOMEGENEIDAD EN EL NOMBRE DE LA CATEGORIA
   private generateSlug(name: string): string {
     return name
-      .toLowerCase()            // convertir todo el nombre pasado por parametro a minuscula
-      .replace(/[^\w\s-]/g, '') // Regex que borra todo lo que no sea letra, número, espacio o guión 
-      .replace(/[\s_]+/g, '-')  // Regex que busca los espacios en blanco y ¨_¨ y los remplaza por ¨-¨
-      .replace(/-+/g, '-')      // Regex que busca si quedaron ¨-¨ multiples seguidos y los remplaza por uno solo 
-      .trim();                  // Regex que borra espacios al inicio y al final de la cadena (por si acaso).
+      .toLowerCase() // convertir todo el nombre pasado por parametro a minuscula
+      .replace(/[^\w\s-]/g, '') // Regex que borra todo lo que no sea letra, número, espacio o guión
+      .replace(/[\s_]+/g, '-') // Regex que busca los espacios en blanco y ¨_¨ y los remplaza por ¨-¨
+      .replace(/-+/g, '-') // Regex que busca si quedaron ¨-¨ multiples seguidos y los remplaza por uno solo
+      .trim(); // Regex que borra espacios al inicio y al final de la cadena (por si acaso).
   }
-  
+
   // CREAR CATEGORIAS CON UN MISMO FORMATO DE NOMBRE
   async createCategory(categoryDTO: CreateCategoryDTO): Promise<CategoryEntity> {
     // convertir el nombre a un solo formato nombre-nombre-nombre.....
     const slug = this.generateSlug(categoryDTO.name);
-    
+
     // revisar que el nombre de la categoria no exista en BD
     const existiCategory = await this.categoryRepository.findOne({ where: { slug } });
     if (existiCategory) {
       throw new ConflictException('Ya existe una categoría con ese nombre');
     }
-    // si todo va bien crea la categoria y guardala en BD 
+    // si todo va bien crea la categoria y guardala en BD
     const category = this.categoryRepository.create({ ...categoryDTO, slug });
     return this.categoryRepository.save(category);
   }
@@ -63,7 +63,7 @@ export class CategoriesService {
       throw new NotFoundException('Categoría no encontrada');
     }
 
-    // si se modifica el nombre conviertelo al fomato adecuado y busca la categoria.  
+    // si se modifica el nombre conviertelo al fomato adecuado y busca la categoria.
     if (updateCategoriaDTO.name) {
       const slug = this.generateSlug(updateCategoriaDTO.name);
       const existiCategory = await this.categoryRepository.findOne({ where: { slug } });
@@ -89,5 +89,4 @@ export class CategoriesService {
       throw new NotFoundException('Categoría no encontrada');
     }
   }
- 
 }

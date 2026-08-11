@@ -32,7 +32,7 @@ export class CouponsService {
     return this.couponRepository.save(coupon);
   }
 
-  // BUSCAR TODOS LOS CUPONES y mostrar los mas nuevos primeros 
+  // BUSCAR TODOS LOS CUPONES y mostrar los mas nuevos primeros
   async findAllCoupons(): Promise<CouponEntity[]> {
     return this.couponRepository.find({ order: { createdAt: 'DESC' } });
   }
@@ -87,9 +87,9 @@ export class CouponsService {
 
   // VALIDAR CUPON para poderlo integrar al carrEntity)
   async validateCoupon(code: string): Promise<{ coupon: CouponEntity; discountPercent: number }> {
-    const coupon = await this.findCouponByCode(code); // busca cupon por codigo 
+    const coupon = await this.findCouponByCode(code); // busca cupon por codigo
 
-    // si no esta activo excepcion 
+    // si no esta activo excepcion
     if (!coupon.isActive) {
       throw new BadRequestException('Este cupón está desactivado');
     }

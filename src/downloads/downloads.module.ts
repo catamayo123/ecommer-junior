@@ -9,12 +9,12 @@ import { DownloadsController } from './downloads.controller';
 import { DownloadsService } from './downloads.service';
 
 @Module({
-	imports: [
-		TypeOrmModule.forFeature([OrderEntity, OrderItemEntity, PaymentEntity]),
-		PassportModule.register({ defaultStrategy: 'jwt' }),
-		AuthModule
-	],
-	controllers: [DownloadsController],
-	providers: [DownloadsService]
+  imports: [
+    TypeOrmModule.forFeature([OrderEntity, OrderItemEntity, PaymentEntity]),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    AuthModule,
+  ],
+  controllers: [DownloadsController],
+  providers: [DownloadsService],
 })
-export class DownloadsModule { }
+export class DownloadsModule {}

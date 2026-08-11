@@ -12,10 +12,10 @@ import { OrderService } from './order.service';
   imports: [
     TypeOrmModule.forFeature([OrderEntity, OrderItemEntity, PaymentEntity]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    CartModule
+    CartModule,
   ],
   providers: [OrderService],
   controllers: [OrderController],
-  exports: [OrderService]
+  exports: [OrderService],
 })
-export class OrderModule { }
+export class OrderModule {}

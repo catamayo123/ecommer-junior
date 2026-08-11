@@ -6,10 +6,7 @@ import { CouponsController } from './coupons.controller';
 import { CouponEntity } from './entities/coupon.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([CouponEntity]),
-    PassportModule.register({ defaultStrategy: 'jwt' }),
-  ],
+  imports: [TypeOrmModule.forFeature([CouponEntity]), PassportModule.register({ defaultStrategy: 'jwt' })],
   providers: [CouponsService],
   controllers: [CouponsController],
   exports: [CouponsService],

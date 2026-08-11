@@ -11,8 +11,8 @@ export class ProductsService {
   constructor(
     @InjectRepository(ProductEntity)
     private readonly productRepository: Repository<ProductEntity>,
-  ) { }
-  // BUSCAR TODOS LOS PRODUCTOS 
+  ) {}
+  // BUSCAR TODOS LOS PRODUCTOS
   /*
     Este devuelve una promesa con un objeto paginado de 10 en 10 de todos los productos existentes
     Se utilizan parametros vinculados para tomar isActive como un string literal. Esto impide que se pase 
@@ -20,12 +20,12 @@ export class ProductsService {
     SQL lo toma de forma sting literal, como una cadena de texto para ser mas preciso y no como una claupsula SQL
   */
   async findAllProducts(queryDTO: QueryProductDTO) {
+    const queryBuilder = this.productRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.category', 'category') // trayendo a que cat pertenece ese producto
+      .where('product.isActive = :isActive', { isActive: true }); // parametro vinculado
 
-    const queryBuilder = this.productRepository.createQueryBuilder('product')
-      .leftJoinAndSelect('product.category', 'category') // trayendo a que cat pertenece ese producto 
-      .where('product.isActive = :isActive', { isActive: true });  // parametro vinculado
-
-    // A partir de la busqueda anterior queryBuilder empezar a agg paramtros de busquedas. En este caso busqueda parcial 
+    // A partir de la busqueda anterior queryBuilder empezar a agg paramtros de busquedas. En este caso busqueda parcial
     // si se introduce searchName. Filtrame todo los nombres que contengan ese nombre
     if (queryDTO.searchName) {
       queryBuilder.andWhere('product.name LIKE :searchName', { searchName: `%${queryDTO.searchName}%` }); // parametro vinculado
@@ -36,7 +36,7 @@ export class ProductsService {
       queryBuilder.andWhere('product.categoryId = :categoryId', { categoryId: queryDTO.categoryId });
     }
 
-    // Filtra por el tipo de producto si se enviaron. Si mandan cursos solo muestra los cursos y asi  
+    // Filtra por el tipo de producto si se enviaron. Si mandan cursos solo muestra los cursos y asi
     if (queryDTO.productType) {
       queryBuilder.andWhere('product.productType = :productType', { productType: queryDTO.productType });
     }
@@ -45,42 +45,42 @@ export class ProductsService {
     if (queryDTO.minPrice !== undefined) {
       queryBuilder.andWhere('product.price >= :minPrice', { minPrice: queryDTO.minPrice });
     }
-    // - > Y hasa el precio maximo 
+    // - > Y hasa el precio maximo
     if (queryDTO.maxPrice !== undefined) {
       queryBuilder.andWhere('product.price <= :maxPrice', { maxPrice: queryDTO.maxPrice });
     }
 
     // ORDENAMIENTO POR LA LISTA QUE SE PUSO del resultado de la busqueda
 
-    const allowedSortFields = ['price', 'name', 'createdAt']; // Lista por donde se puede ordenar  
+    const allowedSortFields = ['price', 'name', 'createdAt']; // Lista por donde se puede ordenar
 
     const sortField = allowedSortFields.includes(queryDTO.sortBy ?? 'createdAt') // si sortBy esta, ordena por los valores que el traiga sino, por defecto ordena por createdAt
-
-      ? `product.${queryDTO.sortBy}` : 'product.createdAt'; // verifica si el valor esta en la lista blanca, para poder ordenar
+      ? `product.${queryDTO.sortBy}`
+      : 'product.createdAt'; // verifica si el valor esta en la lista blanca, para poder ordenar
 
     const order = queryDTO.sortOrder === 'ASC' ? 'ASC' : 'DESC'; // Si enviaron ASC ordena por el, sino ordena por defecto por DESC
 
     queryBuilder.orderBy(sortField, order); // aplica el ORDER BY a la tabla.
 
-    const total = await queryBuilder.getCount(); // cuenta cuantos productos hay sin paginar 
+    const total = await queryBuilder.getCount(); // cuenta cuantos productos hay sin paginar
     const products = await queryBuilder
       .skip(((queryDTO.page ?? 1) - 1) * (queryDTO.limit ?? 10)) // selecciona solo los de la ultima pag para saber cuantos hay
-      .take(queryDTO.limit ?? 10)     // limita a 10 el numero max de resltados a 10 Limit = 10 en SQL
-      .getMany();    // Ejecuta la consulta completa con todos los filtros, devuelve un arr de instancias de productos 
+      .take(queryDTO.limit ?? 10) // limita a 10 el numero max de resltados a 10 Limit = 10 en SQL
+      .getMany(); // Ejecuta la consulta completa con todos los filtros, devuelve un arr de instancias de productos
 
     return {
-      data: products,                                         // productos de esa pagina
-      total,                                                  // total de productos segun lo buscado
-      page: queryDTO.page ?? 1,                               // Pagiana actual del total que hallan 
-      limit: queryDTO.limit ?? 10,                            // Total de productos por pagina
-      totalPages: Math.ceil(total / (queryDTO.limit ?? 10)),  // Total de paginas redondeando por exceso 
+      data: products, // productos de esa pagina
+      total, // total de productos segun lo buscado
+      page: queryDTO.page ?? 1, // Pagiana actual del total que hallan
+      limit: queryDTO.limit ?? 10, // Total de productos por pagina
+      totalPages: Math.ceil(total / (queryDTO.limit ?? 10)), // Total de paginas redondeando por exceso
     };
   }
 
   // BUSCAR TODOS LOS PRODUCTOS PARA EL ADMIN (con paginación, filtros, ordenamiento y sin filtrar por isActive)
   async findAllProductsAdmin(queryDTO: QueryProductDTO) {
-
-    const queryBuilder = this.productRepository.createQueryBuilder('product')
+    const queryBuilder = this.productRepository
+      .createQueryBuilder('product')
       .leftJoinAndSelect('product.category', 'category');
 
     if (queryDTO.searchName) {
@@ -105,7 +105,8 @@ export class ProductsService {
 
     const allowedSortFields = ['price', 'name', 'createdAt'];
     const sortField = allowedSortFields.includes(queryDTO.sortBy ?? 'createdAt')
-      ? `product.${queryDTO.sortBy}` : 'product.createdAt';
+      ? `product.${queryDTO.sortBy}`
+      : 'product.createdAt';
     const order = queryDTO.sortOrder === 'ASC' ? 'ASC' : 'DESC';
 
     queryBuilder.orderBy(sortField, order);
@@ -139,7 +140,7 @@ export class ProductsService {
     return product;
   }
 
-  // BUSCAR PRODUCTO POR ID 
+  // BUSCAR PRODUCTO POR ID
   async findProductById(id: string): Promise<ProductEntity> {
     const product = await this.productRepository.findOne({ where: { id } });
 
@@ -189,7 +190,7 @@ export class ProductsService {
     }
   }
 
-  // METODO PARA GENERAR EL SLUG AUTOMATICO DEPENDIENDO EL NOMBRE 
+  // METODO PARA GENERAR EL SLUG AUTOMATICO DEPENDIENDO EL NOMBRE
   private generateSlug(name: string): string {
     return name
       .toLowerCase()
@@ -198,5 +199,4 @@ export class ProductsService {
       .replace(/-+/g, '-')
       .trim();
   }
-
 }

@@ -4,7 +4,6 @@ import { OrderEntity } from './order.entity';
 
 @Entity('order_items')
 export class OrderItemEntity {
-
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -28,12 +27,12 @@ export class OrderItemEntity {
   @Column({ type: 'timestamp', nullable: true })
   downloadTokenExpiresAt!: Date | null;
 
-  // Muchas OrderItems pertencen a una orden. Se borra en casadad 
+  // Muchas OrderItems pertencen a una orden. Se borra en casadad
   @ManyToOne(() => OrderEntity, (order) => order.items, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'orderId' })
   order!: OrderEntity;
 
-  // Muchos productos pertenecen a una orden 
+  // Muchos productos pertenecen a una orden
   @ManyToOne(() => ProductEntity)
   @JoinColumn({ name: 'productId' })
   product!: ProductEntity;

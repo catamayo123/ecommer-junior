@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany, JoinColumn, CreateDateColumn, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToOne,
+  OneToMany,
+  JoinColumn,
+  CreateDateColumn,
+  ManyToOne,
+} from 'typeorm';
 import { UserEntity } from '../../users/entities/user.entity';
 import { CartItemEntity } from './cart-item.entity';
 import { CouponEntity } from '../../coupons/entities/coupon.entity';
@@ -10,30 +19,29 @@ export class CartEntity {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   lastActivity!: Date;
-  
+
   // columna FK con Users
   @Column({ type: 'uuid' })
-  userId!: string;       
-  
+  userId!: string;
+
   // columna FK con Coupon
   @Column({ type: 'uuid', nullable: true })
   couponId!: string | null;
 
-  // Un usuario tiene un solo carrito 
+  // Un usuario tiene un solo carrito
   @OneToOne(() => UserEntity)
   @JoinColumn({ name: 'userId' }) // la FK se llama userId
   user!: UserEntity;
 
-  // Un carriro tiene muchos items 
+  // Un carriro tiene muchos items
   @OneToMany(() => CartItemEntity, (item) => item.cart, { cascade: true })
   items!: CartItemEntity[];
 
-  // Un carrito tiene o no, muchos cupones 
+  // Un carrito tiene o no, muchos cupones
   @ManyToOne(() => CouponEntity)
-  @JoinColumn({name: 'couponId'})
+  @JoinColumn({ name: 'couponId' })
   cupon!: CouponEntity | null;
 
   @CreateDateColumn()
   createdAt!: Date;
-
 }

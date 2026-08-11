@@ -8,12 +8,12 @@ import { PaymentService } from './payment.service';
 
 @Controller('payments')
 export class PaymentController {
-    constructor(private readonly paymentService: PaymentService) { }
+  constructor(private readonly paymentService: PaymentService) {}
 
-    @Post('pay/:id')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(UserRole.ADMIN)
-    pay(@Param('id') paymentId: string, @CurrentUser('id') adminId: string) {
-        return this.paymentService.pay(paymentId, adminId)
-    }
+  @Post('pay/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  pay(@Param('id') paymentId: string, @CurrentUser('id') adminId: string) {
+    return this.paymentService.pay(paymentId, adminId);
+  }
 }
