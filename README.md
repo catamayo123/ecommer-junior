@@ -60,7 +60,7 @@ FASE 1 — Core ( LISTO )
 
 •	Carpetas uploads/portadas y uploads/archivos
 
-FASE 2 — Carrito y Órdenes (pendiente ReviewsModule)
+FASE 2 — Carrito y Órdenes ( LISTO )
 
 •	CartModule — Carrito persistente (CRUD, expiración 30 días, priceAtPurchase, totales vivos)
 

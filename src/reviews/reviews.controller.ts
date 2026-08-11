@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { UserRole } from '../../enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -13,7 +13,7 @@ export class ReviewsController {
 	constructor(private readonly reviewsService: ReviewsService) { }
 
 	// CREAR RESEÑA
-	@Get('crear')
+	@Post('crear')
 	@UseGuards(JwtAuthGuard)
 	createReview(@CurrentUser('id') userId: string, @Body() creteDTO: CreateReviewDTO) {
 		return this.reviewsService.createReview(userId, creteDTO)
