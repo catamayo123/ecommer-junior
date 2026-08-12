@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
@@ -21,6 +23,14 @@ import { WishListModule } from './wish-list/wish-list.module';
       envFilePath: 'config/.dev.env',
       isGlobal: true,
     }),
+
+    // RATE LIMITING: Límite global de 100 peticiones/min por IP
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60_000, // ventana de 1 minuto
+        limit: 100, // máximo 100 peticiones por minuto (por IP)
+      },
+    ]),
 
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -56,6 +66,13 @@ import { WishListModule } from './wish-list/wish-list.module';
     DownloadsModule,
     ReviewsModule,
     WishListModule,
+  ],
+  providers: [
+    // GUARD GLOBAL: aplica el Rate limit a TODOS los endpoints
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}
