@@ -49,7 +49,7 @@ export class WishListService {
     });
     if (!wish) throw new NotFoundException('producto no encontrado en su lista de favoritos');
 
-    await this.wishListRepository.save(wish);
+    await this.wishListRepository.softRemove(wish);
     return { message: 'Favorito eliminado' };
   }
 }

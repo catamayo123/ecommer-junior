@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn } from 'typeorm';
 
 @Entity('coupons')
 export class CouponEntity {
@@ -25,4 +25,11 @@ export class CouponEntity {
 
   @CreateDateColumn()
   createdAt!: Date;
+  
+  @DeleteDateColumn()
+  deletedAt!: Date | null;
 }
+/*
+@DeleteDateColumn() siempre va despues del utimo @CreateDateColumn(), y es el que se encarga de decirle 
+a typeOrm lo del sof-delete
+*/

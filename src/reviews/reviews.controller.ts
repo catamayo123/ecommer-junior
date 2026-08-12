@@ -10,7 +10,7 @@ import { ReviewsService } from './reviews.service';
 
 @Controller('reviews')
 export class ReviewsController {
-  constructor(private readonly reviewsService: ReviewsService) {}
+  constructor(private readonly reviewsService: ReviewsService) { }
 
   // CREAR RESEÑA
   @Post('crear')
@@ -28,7 +28,10 @@ export class ReviewsController {
   // MODIFICAR RESEÑAS
   @Patch('update/:id')
   @UseGuards(JwtAuthGuard)
-  updateReview(@CurrentUser('id') userId: string, @Param('id') id: string, updateDTO: UpdateReviewDTO) {
+  updateReview(
+    @CurrentUser('id') userId: string,
+    @Param('id') id: string,
+    @Body() updateDTO: UpdateReviewDTO) {
     return this.reviewsService.updateReview(userId, id, updateDTO);
   }
 

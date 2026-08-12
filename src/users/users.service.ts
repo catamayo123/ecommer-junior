@@ -44,9 +44,13 @@ export class UsersService {
     return this.userRepository.find();
   }
 
-  // ELIMINAR USUARIO
-  async removeUser(id: string): Promise<void> {
-    await this.userRepository.delete(id);
+  // ELIMINAR USUARIO (soft-delete)
+  async removeUser(id: string): Promise<{ message: string }> {
+    const result = await this.userRepository.softDelete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    return { message: 'Usuario eliminado correctamente' };
   }
 
   /********************** PROFILE **********************/

@@ -1,4 +1,7 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne,
+  PrimaryGeneratedColumn
+} from 'typeorm';
 import { ProductType } from '../../../enum/index';
 import { CategoryEntity } from '../../categories/entities/category.entity';
 
@@ -48,4 +51,7 @@ export class ProductEntity {
 
   @CreateDateColumn()
   createdAt!: Date;
+
+  @DeleteDateColumn()
+  deletedAt!: Date | null;
 }

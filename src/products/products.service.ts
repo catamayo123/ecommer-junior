@@ -182,12 +182,13 @@ export class ProductsService {
     return this.productRepository.save(product);
   }
 
-  // ELIMINAR PRODUCTOS
-  async removeProduct(id: string): Promise<void> {
-    const result = await this.productRepository.delete(id);
+  // ELIMINAR PRODUCTOS (soft-delete)
+  async removeProduct(id: string): Promise<{ message: string }> {
+    const result = await this.productRepository.softDelete(id);
     if (result.affected === 0) {
       throw new NotFoundException('Producto no encontrado');
     }
+    return { message: 'Producto eliminado correctamente' };
   }
 
   // METODO PARA GENERAR EL SLUG AUTOMATICO DEPENDIENDO EL NOMBRE

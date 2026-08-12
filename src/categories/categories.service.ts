@@ -82,11 +82,12 @@ export class CategoriesService {
     return this.categoryRepository.save(category);
   }
 
-  // ELIMINAR CATEGORIA
-  async removeCategory(id: string): Promise<void> {
-    const result = await this.categoryRepository.delete(id);
+  // ELIMINAR CATEGORIA (soft-delete)
+  async removeCategory(id: string): Promise<{ message: string }> {
+    const result = await this.categoryRepository.softDelete(id);
     if (result.affected === 0) {
       throw new NotFoundException('Categoría no encontrada');
     }
+    return { message: 'Categoría eliminada correctamente' };
   }
 }

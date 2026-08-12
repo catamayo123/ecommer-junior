@@ -77,12 +77,13 @@ export class CouponsService {
     return this.couponRepository.save(coupon);
   }
 
-  // ELIMINAR CUPON
-  async removeCoupon(id: string): Promise<void> {
-    const result = await this.couponRepository.delete(id);
+  // ELIMINAR CUPON (soft-delete)
+  async removeCoupon(id: string): Promise<{ message: string }> {
+    const result = await this.couponRepository.softDelete(id);
     if (result.affected === 0) {
       throw new NotFoundException('Cupón no encontrado');
     }
+    return { message: 'Cupón eliminado correctamente' };
   }
 
   // VALIDAR CUPON para poderlo integrar al carrEntity)

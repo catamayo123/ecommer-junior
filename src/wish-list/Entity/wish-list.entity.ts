@@ -1,4 +1,7 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import {
+  Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne,
+  PrimaryGeneratedColumn, Unique
+} from 'typeorm';
 import { ProductEntity } from '../../products/entities/product.entity';
 import { UserEntity } from '../../users/entities/user.entity';
 
@@ -14,9 +17,6 @@ export class WhishListEntity {
   @Column({ type: 'uuid' })
   productId!: string;
 
-  @CreateDateColumn()
-  createdAt!: Date;
-
   @ManyToOne(() => UserEntity)
   @JoinColumn({ name: 'userId' })
   user!: UserEntity;
@@ -24,4 +24,10 @@ export class WhishListEntity {
   @ManyToOne(() => ProductEntity)
   @JoinColumn({ name: 'productId' })
   product!: ProductEntity;
+
+  @CreateDateColumn()
+  createdAt!: Date;
+
+  @DeleteDateColumn()
+  deletedAt!: Date | null;
 }

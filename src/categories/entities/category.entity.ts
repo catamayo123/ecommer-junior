@@ -1,4 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, CreateDateColumn } from 'typeorm';
+import {
+  Column, CreateDateColumn, DeleteDateColumn,
+  Entity, JoinColumn, ManyToOne, OneToMany,
+  PrimaryGeneratedColumn
+} from 'typeorm';
 
 @Entity('categories')
 export class CategoryEntity {
@@ -26,6 +30,9 @@ export class CategoryEntity {
 
   @CreateDateColumn()
   createdAt!: Date;
+
+  @DeleteDateColumn()
+  deletedAt!: Date | null;
 }
 
 /*

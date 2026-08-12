@@ -51,7 +51,7 @@ export class ReviewsService {
       where: { userId, productId: createDTO.productId },
     });
 
-    if (!oneReview) throw new ConflictException('Ya realizaste una reseña sobre este producto');
+    if(oneReview) throw new ConflictException('Ya realizaste una reseña sobre este producto');
 
     const review = this.reviewRepository.create({ ...createDTO, userId });
     return this.reviewRepository.save(review);
@@ -65,7 +65,7 @@ export class ReviewsService {
       order: { createdAt: 'DESC' },
     });
 
-    const count = reviews.concat.length;
+    const count = reviews.length;
     const averageRating =
       count > 0
         ? // calcular el promedio
