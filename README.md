@@ -82,7 +82,7 @@ FASE 4 — Pulido (postergado)
 
 •	Rate limiting — para proteger la API de ataques de fuerza bruta y spam
 
-•	Soft delete par ala proteccion de las relacines en la BD
+•	Soft delete par ala protección de las relaciones en la BD
 
 •	Health check
 

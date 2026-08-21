@@ -15,7 +15,8 @@ export class AuthService {
 
   // REGISTRARSE CREA USUARIO EN LA BD SIN EL CODIGO DE VERIFICACION DEL CORREO
   async register(registerDTO: RegisterDTO) {
-    const existingUser = await this.usersService.findUserByEmail(registerDTO.email);
+    // incluye usuarios con soft-delete para no chocar con el email único y lanzar 409 limpio
+    const existingUser = await this.usersService.findUserByEmailWithDeleted(registerDTO.email);
     if (existingUser) {
       // Las excepciones que se manejan aca son propias de nest JS
       throw new ConflictException('El email ya está siendo usado por otro usuario');
@@ -79,10 +80,15 @@ export class AuthService {
     if (!passValid) {
       throw new UnauthorizedException('Credenciales inválidas');
     }
-    // validar verifiacion de email
+    // validar que la cuenta no esté bloqueada
+    if (!user.isActive) {
+      throw new UnauthorizedException('Tu cuenta está bloqueada');
+    }
+    // validar la verifiacion del email
     if (!user.emailVerified) {
       throw new UnauthorizedException('Debes verificar tu email antes de iniciar sesión');
     }
+    
     // crear un obj con los datos que van dentro del token del jwt
     const payload = { sub: user.id, email: user.email, role: user.role };
 

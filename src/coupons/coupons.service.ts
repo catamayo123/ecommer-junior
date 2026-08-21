@@ -77,16 +77,16 @@ export class CouponsService {
     return this.couponRepository.save(coupon);
   }
 
-  // ELIMINAR CUPON (soft-delete)
+  // ELIMINAR CUPON 
   async removeCoupon(id: string): Promise<{ message: string }> {
-    const result = await this.couponRepository.softDelete(id);
+    const result = await this.couponRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException('Cupón no encontrado');
     }
     return { message: 'Cupón eliminado correctamente' };
   }
 
-  // VALIDAR CUPON para poderlo integrar al carrEntity)
+  // VALIDAR CUPON para poderlo integrar al carrito)
   async validateCoupon(code: string): Promise<{ coupon: CouponEntity; discountPercent: number }> {
     const coupon = await this.findCouponByCode(code); // busca cupon por codigo
 

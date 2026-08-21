@@ -22,24 +22,37 @@ export class WishListService {
 
     if (!product) throw new NotFoundException('Producto no encontrado');
 
-    // validar que el  se add una sola vez a la lista de deseos
+    // buscar el favorito incluyendo los eliminados (soft) para poder restaurarlo
     const exists = await this.wishListRepository.findOne({
       where: { userId, productId: createDTO.productId },
+      withDeleted: true,
     });
 
-    if (!exists) throw new ConflictException('Ya realizaste una reseña sobre este producto');
+    // si ya está activo en la lista, no se puede agregar de nuevo
+    if (exists && !exists.deletedAt) {
+      throw new ConflictException('Ya tienes este producto en tu lista de deseos');
+    }
 
-    const review = this.wishListRepository.create({ ...createDTO, userId });
-    return this.wishListRepository.save(review);
+    // si existía pero fue eliminado por el usuario, se restaura en vez de crear un duplicado
+    if (exists && exists.deletedAt) {
+      await this.wishListRepository.restore(exists.id);
+      return this.wishListRepository.findOne({ where: { id: exists.id } });
+    }
+
+    const wish = this.wishListRepository.create({ ...createDTO, userId });
+    return this.wishListRepository.save(wish);
   }
 
   // VER LA LISTA DE FAVORITOS
   async findALLWishList(userId: string) {
-    return await this.wishListRepository.find({
+    const wishList = await this.wishListRepository.find({
       where: { userId },
       relations: ['product'],
       order: { createdAt: 'DESC' },
     });
+
+    // filtrar los favoritos cuyo producto fue soft-deleteado (product: null) para que el cliente no los vea
+    return wishList.filter((item) => item.product);
   }
 
   // ELIMINAR PRODUCTO DE LA LISTA DE FAVORITOS

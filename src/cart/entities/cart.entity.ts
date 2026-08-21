@@ -28,8 +28,9 @@ export class CartEntity {
   @OneToMany(() => CartItemEntity, (item) => item.cart, { cascade: true })
   items!: CartItemEntity[];
 
-  // Un carrito tiene o no, muchos cupones
-  @ManyToOne(() => CouponEntity)
+  // Un carrito tiene o no, muchos cupones. 
+  // onDelete SET NULL: si el cupón se borra, el carrito queda sin cupón aplicado
+  @ManyToOne(() => CouponEntity, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'couponId' })
   cupon!: CouponEntity | null;
 

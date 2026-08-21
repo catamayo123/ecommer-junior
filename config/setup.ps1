@@ -32,7 +32,7 @@ CREATE DATABASE $dbName OWNER $dbUser;
 GRANT ALL PRIVILEGES ON DATABASE $dbName TO $dbUser;
 "@ | Out-File -FilePath $tempSql -Encoding ASCII
 
-& "C:\Program Files\Instaladores\PostgreSQL\15\bin\psql.exe" -U postgres -f $tempSql 2>&1
+& "C:\Program Files\PostgreSQL\15\bin\psql.exe" -U postgres -f $tempSql 2>&1
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "Base de datos '$dbName' y usuario '$dbUser' creados correctamente." -ForegroundColor Green

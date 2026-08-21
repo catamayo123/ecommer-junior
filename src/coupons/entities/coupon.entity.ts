@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, DeleteDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
 @Entity('coupons')
 export class CouponEntity {
@@ -25,11 +25,8 @@ export class CouponEntity {
 
   @CreateDateColumn()
   createdAt!: Date;
-  
-  @DeleteDateColumn()
-  deletedAt!: Date | null;
 }
 /*
-@DeleteDateColumn() siempre va despues del utimo @CreateDateColumn(), y es el que se encarga de decirle 
-a typeOrm lo del sof-delete
+Los cupones NO usan soft-delete: se borran completamente con repository.delete().
+Si se elimina un cupón, los carritos que lo tenían quedan sin cupón (SET NULL en la FK).
 */

@@ -19,6 +19,11 @@ export class UsersService {
     return this.userRepository.findOne({ where: { email } });
   }
 
+  // BUSCAR EMAIL INCLUYENDO USUARIOS BLOQUEADOS O ELIMINADOS (soft) PARA EL CHECK DE UNICIDAD
+  async findUserByEmailWithDeleted(email: string): Promise<UserEntity | null> {
+    return this.userRepository.findOne({ where: { email }, withDeleted: true });
+  }
+
   // BUSCAR USUARIO POR ID
   async findUserById(id: string): Promise<UserEntity | null> {
     return this.userRepository.findOne({ where: { id } });
@@ -44,13 +49,22 @@ export class UsersService {
     return this.userRepository.find();
   }
 
-  // ELIMINAR USUARIO (soft-delete)
+  // BLOQUEAR USUARIO (ya no se elimina, se bloquea; el login queda rechazado)
   async removeUser(id: string): Promise<{ message: string }> {
-    const result = await this.userRepository.softDelete(id);
+    const result = await this.userRepository.update(id, { isActive: false });
     if (result.affected === 0) {
       throw new NotFoundException('Usuario no encontrado');
     }
-    return { message: 'Usuario eliminado correctamente' };
+    return { message: 'Usuario bloqueado correctamente' };
+  }
+
+  // DESBLOQUEAR USUARIO
+  async restoreUser(id: string): Promise<{ message: string }> {
+    const result = await this.userRepository.update(id, { isActive: true });
+    if (result.affected === 0) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    return { message: 'Usuario desbloqueado correctamente' };
   }
 
   /********************** PROFILE **********************/
@@ -76,7 +90,7 @@ export class UsersService {
       const isValid = await bcrypt.compare(data.currentPass, user.password);
       if (!isValid) throw new BadRequestException('El pass actual no es valido');
 
-      const existUserByEmail = await this.findUserByEmail(data.email);
+      const existUserByEmail = await this.findUserByEmailWithDeleted(data.email);
       if (existUserByEmail && existUserByEmail.id !== id)
         throw new ConflictException('El email esta siendo usado por otro Usuario');
 

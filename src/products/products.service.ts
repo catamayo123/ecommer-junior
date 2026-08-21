@@ -23,7 +23,8 @@ export class ProductsService {
     const queryBuilder = this.productRepository
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.category', 'category') // trayendo a que cat pertenece ese producto
-      .where('product.isActive = :isActive', { isActive: true }); // parametro vinculado
+      .where('product.isActive = :isActive', { isActive: true }) // parametro vinculado
+      .andWhere('product.deletedAt IS NULL'); // el QueryBuilder no filtra el soft-delete solo
 
     // A partir de la busqueda anterior queryBuilder empezar a agg paramtros de busquedas. En este caso busqueda parcial
     // si se introduce searchName. Filtrame todo los nombres que contengan ese nombre
@@ -117,8 +118,9 @@ export class ProductsService {
       .take(queryDTO.limit ?? 10)
       .getMany();
 
+    // el admin ve todo (incluidos borrados soft) y se le indica cuál está borrado con isDeleted
     return {
-      data: products,
+      data: products.map((product) => ({ ...product, isDeleted: product.deletedAt !== null })),
       total,
       page: queryDTO.page ?? 1,
       limit: queryDTO.limit ?? 10,
@@ -154,7 +156,8 @@ export class ProductsService {
   async createProduct(createProductDTO: CreateProductDTO): Promise<ProductEntity> {
     const slug = this.generateSlug(createProductDTO.name);
 
-    const existingProduct = await this.productRepository.findOne({ where: { slug } });
+    // withDeleted para detectar también filas borradas (soft) y lanzar 409 en vez del error de constraint
+    const existingProduct = await this.productRepository.findOne({ where: { slug }, withDeleted: true });
     if (existingProduct) {
       throw new ConflictException('Ya existe un producto con ese nombre');
     }
@@ -169,7 +172,7 @@ export class ProductsService {
 
     if (updateProductDTO.name) {
       const slug = this.generateSlug(updateProductDTO.name);
-      const existingProduct = await this.productRepository.findOne({ where: { slug } });
+      const existingProduct = await this.productRepository.findOne({ where: { slug }, withDeleted: true });
 
       if (existingProduct && existingProduct.id !== id) {
         throw new ConflictException('Ya existe otro producto con ese nombre');
@@ -189,6 +192,15 @@ export class ProductsService {
       throw new NotFoundException('Producto no encontrado');
     }
     return { message: 'Producto eliminado correctamente' };
+  }
+
+  // RESTAURAR PRODUCTO (soft-delete)
+  async restoreProduct(id: string): Promise<{ message: string }> {
+    const result = await this.productRepository.restore(id);
+    if (result.affected === 0) {
+      throw new NotFoundException('Producto no encontrado');
+    }
+    return { message: 'Producto restaurado correctamente' };
   }
 
   // METODO PARA GENERAR EL SLUG AUTOMATICO DEPENDIENDO EL NOMBRE

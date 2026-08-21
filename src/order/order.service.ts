@@ -17,7 +17,7 @@ export class OrderService {
     private readonly orderItemRepository: Repository<OrderItemEntity>,
     @InjectRepository(PaymentEntity)
     private readonly paymentRepository: Repository<PaymentEntity>,
-  ) {}
+  ) { }
 
   // CREAR ORDEN. QUE HACE ?
   /* 
@@ -85,6 +85,7 @@ export class OrderService {
       where: { userId },
       relations: ['items', 'items.product', 'payment'],
       order: { createdAt: 'DESC' },
+      withDeleted: true,
     });
   }
 
@@ -97,6 +98,7 @@ export class OrderService {
     const order = await this.orderRepository.findOne({
       where,
       relations: ['items', 'items.product', 'payment'],
+      withDeleted: true, // para que se mantenga el soft delete
     });
 
     // Si no existe la orden retorna exception

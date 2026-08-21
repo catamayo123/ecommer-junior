@@ -1,14 +1,5 @@
 import {
-  BadRequestException,
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UploadedFile,
+  BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query, UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -27,7 +18,7 @@ import { ProductsService } from './products.service';
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly productsService: ProductsService) { }
 
   @Get('find')
   findAllProducts(@Query() queryProductDTO: QueryProductDTO) {
@@ -65,6 +56,13 @@ export class ProductsController {
   @Roles(UserRole.ADMIN)
   removeProduct(@Param('id') id: string) {
     return this.productsService.removeProduct(id);
+  }
+
+  @Patch('restore/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  restoreProduct(@Param('id') id: string) {
+    return this.productsService.restoreProduct(id);
   }
 
   // GUARDAR PORTADA

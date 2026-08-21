@@ -10,11 +10,21 @@ import { UserRole } from '../../enum/index';
 @Controller('categories')
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
-  // BUSCAR TODOS
+
+  // BUSCAR TODAS LAS CATEGORIAS
   @Get('findAll')
   findAllCategory() {
     return this.categoriesService.findAllCategory();
   }
+
+  // BUSCAR TODAS LAS CATEGORIAS (SOLO ADMIN)
+  @Get('adminFindAll')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  findAllCategoriesAdmin() {
+    return this.categoriesService.findAllCategoriesAdmin();
+  }
+
   // BUSCAR CAT POR SU SLUG CON EL @Param('slug')
   @Get('find/:slug')
   findCategoryBySlug(@Param('slug') slug: string) {
@@ -42,5 +52,13 @@ export class CategoriesController {
   @Roles(UserRole.ADMIN)
   removeCategory(@Param('id') id: string) {
     return this.categoriesService.removeCategory(id);
+  }
+
+  // RESTAURAR CATEGORIAS Y SUS SUBCATEGORIAS (SOLO ADMIN)
+  @Patch('restore/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  restoreCategory(@Param('id') id: string) {
+    return this.categoriesService.restoreCategory(id);
   }
 }

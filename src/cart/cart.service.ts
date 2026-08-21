@@ -256,14 +256,17 @@ export class CartService {
     await this.cartRepository.update(cartId, { lastActivity: new Date() });
   }
 
-  // TRANSFORMAR EL CARRITO ACTTUAL CON TODOS SUS ITEMS Y PRODUCTOS EN UN JSON ESTRUCTURADO POR TOTALES Y SUBTOTALES
+  // TRANSFORMAR EL CARRITO ACTTUAL CON TODOS SUS ITEMS Y PRODUCTOS EN UN JSON ESTRUCTURADO 
+  // POR TOTALES Y SUBTOTALES
   private async buildCartResponse(cart: CartEntity): Promise<CartResponse> {
     let validDiscountPercent = 0;
     let cuponExpirado = false;
-    //Si el carrito tiene cupon. cuponCode = code, sino cuponCode = null
+    
+    //Si el carrito tiene cupon, cuponCode = code, sino cuponCode = null
     const cuponCode = cart.cupon ? cart.cupon.code : null;
 
-    // existe cupon en el carrito, validalo, si esta vigente guarda el % de descuento y coloca el porciento, sino, cupon expirado
+    // existe cupon en el carrito, validalo, si esta vigente guarda el % de descuento y coloca el porciento, 
+    // sino, cupon expirado
     if (cart.cupon) {
       try {
         const validated = await this.couponsService.validateCoupon(cart.cupon.code);
@@ -273,39 +276,48 @@ export class CartService {
       }
     }
 
-    const items = (cart.items || []).map((cartItem) => {
+    const items = (cart.items || [])
       // Si cart.items es null, usar un arr bacio para que map() no de error
+      // Filtrar items cuyo producto fue soft-deleteado (product: null) para que el cliente no los vea ni los pague
+      .filter((cartItem) => cartItem.product)
+      .map((cartItem) => {
+        // obtiene el producto del carrito
+        const product = cartItem.product;
+        // precio actual transformado de string a number, si es null, tomalo como 0
+        const currentPrice = product ? Number(product.price) : 0;
+        // cantiad de items actuales en el carrito
+        const quantity = cartItem.quantity;
+        // subtotal = precioActual * cantidad de productos
+        const subtotal = currentPrice * quantity;
+        // descuento por unidad segun cupon
+        const unitDiscount = validDiscountPercent > 0 ? (currentPrice * validDiscountPercent) / 100 : 0;
+        // descuento total
+        const totalDiscount = unitDiscount * quantity;
+        // total con descuento aplicado
+        const total = subtotal - totalDiscount;
 
-      const product = cartItem.product; // obtiene el producto del carrito
-      const currentPrice = product ? Number(product.price) : 0; // precio actual transformado de string a number, si es null, tomalo como 0
-      const quantity = cartItem.quantity; // cantiad de items actuales en el carrito
-      const subtotal = currentPrice * quantity; // subtotal = precioActual * cantidad de productos
-      const unitDiscount = validDiscountPercent > 0 ? (currentPrice * validDiscountPercent) / 100 : 0; // descuento por unidad segun cupon
-      const totalDiscount = unitDiscount * quantity; // descuento total
-      const total = subtotal - totalDiscount; // total con descuento aplicado
-
-      // Retornar un objeto transformado en JSON por cada items que contenga el carrito
-      return {
-        id: cartItem.id,
-        product: product // si el producto existe devuelve la informacion necesaria
-          ? {
-              id: product.id,
-              name: product.name,
-              slug: product.slug,
-              coverImage: product.coverImage,
-              price: currentPrice,
-              productType: product.productType,
-            }
-          : null, // si no existe el producto devuelve null
-        quantity,
-        unitPrice: currentPrice,
-        priceAtPurchase: Number(cartItem.priceAtPurchase), // precio que tenia cuando se agg al carrito
-        unitDiscount,
-        subtotal,
-        totalDiscount,
-        total,
-      };
-    });
+        // Retornar un objeto transformado en JSON por cada items que contenga el carrito
+        return {
+          id: cartItem.id,
+          product: product // si el producto existe devuelve la informacion necesaria
+            ? {
+                id: product.id,
+                name: product.name,
+                slug: product.slug,
+                coverImage: product.coverImage,
+                price: currentPrice,
+                productType: product.productType,
+              }
+            : null, // si no existe el producto devuelve null
+          quantity,
+          unitPrice: currentPrice,
+          priceAtPurchase: Number(cartItem.priceAtPurchase), // precio que tenia cuando se agg al carrito
+          unitDiscount,
+          subtotal,
+          totalDiscount,
+          total,
+        };
+      });
 
     // Calcular Resumen: el metodo reduce(), itera sobre todos los items y ejecuta lo que esta dentro
     const summary = items.reduce(

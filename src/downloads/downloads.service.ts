@@ -4,11 +4,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { existsSync } from 'fs';
 import { basename, join } from 'path';
 import { Repository } from 'typeorm';
+import { OrderStatus, PaymentStatus, ProductType } from '../../enum';
 import { OrderItemEntity } from '../order/entities/order-item.entity';
 import { OrderEntity } from '../order/entities/order.entity';
 import { PaymentEntity } from '../payment/entities/payment.entity';
 import { IBaseICourseAndIBook, ICourses, IeBooks } from './interfaces/downloads.interface';
-import { OrderStatus, PaymentStatus, ProductType } from '../../enum';
 
 @Injectable()
 export class DownloadsService {
@@ -20,20 +20,21 @@ export class DownloadsService {
     @InjectRepository(PaymentEntity)
     private readonly paymentRepository: Repository<PaymentEntity>,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   // LISTAR TODOS LOS PRODUCTOS COMPRADOS POR EL USUARIO
   /*
-		Busca todas las ordenes de ese usuario 
-		Recorre todas esas ordenes y los items de cada orden opteniendo solo los productos que si esten 
-		Crea la base de la descargas con todas sus propiedades para poder add a los cursos y eBooks que extienden de ella
-		Crea course si son videos y sino crea eBooks
-		Retorna los 2 [], curso y eBooks
-	*/
+    Busca todas las ordenes de ese usuario 
+    Recorre todas esas ordenes y los items de cada orden opteniendo solo los productos que si esten 
+    Crea la base de la descargas con todas sus propiedades para poder add a los cursos y eBooks que extienden de ella
+    Crea course si son videos y sino crea eBooks
+    Retorna los 2 [], curso y eBooks
+  */
   async findAllDownloads(userId: string) {
     const orders = await this.orderRepository.find({
       where: { userId, status: OrderStatus.COMPLETED },
       relations: ['items', 'items.product', 'items.product.category'],
+      withDeleted: true,
     });
 
     const course: ICourses[] = [];
@@ -121,9 +122,9 @@ export class DownloadsService {
 
   // SOLICITAR RENOVACION:
   /*
-		Si el token vencio entonces se puede renovar
-		Solo se renueva una sola vez, si ya el libro se renovo, no se puede hacer mas 
-	*/
+    Si el token vencio entonces se puede renovar
+    Solo se renueva una sola vez, si ya el libro se renovo, no se puede hacer mas 
+  */
   async requestRenewal(userId: string, orderItemId: string) {
     // busca un item, si el tipo de producto no es libro coloco el mensaje
     const item = await this.findOwnedEbookItem(userId, orderItemId, 'Solo los eBooks tienen renovación');
@@ -148,12 +149,13 @@ export class DownloadsService {
 
   // ADMIN CONFIRMA EL PAGO DE LA RENOVACION
   /*
-		paga y regenera el token SOLO en el orderItemId indicado
-	*/
+    paga y regenera el token SOLO en el orderItemId indicado
+  */
   async payRenewal(paymentId: string, orderItemId: string, adminId: string) {
     const payment = await this.paymentRepository.findOne({
       where: { id: paymentId },
       relations: ['order'],
+      withDeleted: true,
     });
 
     if (!payment) {
@@ -174,6 +176,7 @@ export class DownloadsService {
     const item = await this.OrderItemRepository.findOne({
       where: { id: orderItemId },
       relations: ['product'],
+      withDeleted: true,
     });
 
     if (!item || item.product.productType !== ProductType.EBOOK) {
@@ -206,12 +209,13 @@ export class DownloadsService {
 
   // Devuelve el OrderItem de CUALQUIER producto comprado (curso o eBook)
   /* 	
-		verificando que exista, pertenezca al usuario y que su orden este completada
-	*/
+    verificando que exista, pertenezca al usuario y que su orden este completada
+  */
   private async findOwnedItem(userId: string, orderItemId: string): Promise<OrderItemEntity> {
     const item = await this.OrderItemRepository.findOne({
       where: { id: orderItemId },
       relations: ['order', 'product'],
+      withDeleted: true,
     });
 
     if (!item || item.order.userId !== userId) {
@@ -227,9 +231,9 @@ export class DownloadsService {
 
   // Devuelve el OrderItem del eBook
   /* 	
-		verificando que exista, pertenezca al usuario, que su orden este completada 
-		y que el producto sea un eBook
-	*/
+    verificando que exista, pertenezca al usuario, que su orden este completada 
+    y que el producto sea un eBook
+  */
   private async findOwnedEbookItem(
     userId: string,
     orderItemId: string,

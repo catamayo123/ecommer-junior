@@ -31,4 +31,14 @@ export class UsersController {
   removeUser(@Param('id') id: string) {
     return this.usersService.removeUser(id);
   }
+
+  @Patch('block/:id')
+  blockUser(@Param('id') id: string) {
+    return this.usersService.removeUser(id);
+  }
+
+  @Patch('unblock/:id')
+  unblockUser(@Param('id') id: string) {
+    return this.usersService.restoreUser(id);
+  }
 }

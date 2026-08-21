@@ -21,6 +21,9 @@ export class UserEntity {
   @Column({ type: 'boolean', default: false })
   emailVerified!: boolean;
 
+  @Column({ type: 'boolean', default: true })
+  isActive!: boolean;
+
   @Column({ type: 'varchar', length: 4, nullable: true })
   verificationCode!: string | null;
 
