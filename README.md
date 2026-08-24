@@ -80,11 +80,11 @@ FASE 3 — Perfil y UX ( LISTO )
 
 FASE 4 — Pulido (postergado)
 
-•	Rate limiting — para proteger la API de ataques de fuerza bruta y spam
+•	Rate limiting — para proteger la API de ataques de fuerza bruta y spam ( LISTO )
 
-•	Soft delete par ala protección de las relaciones en la BD
+•	Soft delete par ala protección de las relaciones en la BD ( LISTO )
 
-•	Health check
+•	Health check ( LISTO )
 
 •	Reset password con email
 
