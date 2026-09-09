@@ -17,6 +17,7 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { UsersModule } from './users/users.module';
 import { WishListModule } from './wish-list/wish-list.module';
 import { HealthModule } from './health/health.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -68,6 +69,8 @@ import { HealthModule } from './health/health.module';
     ReviewsModule,
     WishListModule,
     HealthModule,
+    EmailModule,
+
   ],
   providers: [
     // GUARD GLOBAL: aplica el Rate limit a TODOS los endpoints

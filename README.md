@@ -86,7 +86,7 @@ FASE 4 — Pulido (postergado)
 
 •	Health check ( LISTO )
 
-•	Reset password con email
+•	Servicio de Email para resetear pass y enviar codigo de 4 digitos
 
 •	Notificaciones por email (Nodemailer + Gmail SMTP)
 

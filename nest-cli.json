@@ -10,6 +10,9 @@
         "classValidatorShim": true,
         "introspectComments": true
       }
-    }]
+    }],
+    "assets": [
+      { "include": "src/email/templates/*.html", "watchAssets": true }
+    ]
   }
 }
