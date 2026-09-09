@@ -27,6 +27,18 @@ export class UserEntity {
   @Column({ type: 'varchar', length: 4, nullable: true })
   verificationCode!: string | null;
 
+  @Column({ type: 'varchar', length: 4, nullable: true })
+  passResetCode!: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  passResetExpires!: Date | null;
+
+  @Column({ type: 'int', default: 0 })
+  passResetAtt!: Date;  // atributo para verificar los intentos fallidos de resetear el pass
+
+  @Column({ type: 'int', default: 0 })
+  verificAtt!: number;  // atributo para verificar los intentos fallidos de verificar el pass
+
   @CreateDateColumn()
   createdAt!: Date;
 

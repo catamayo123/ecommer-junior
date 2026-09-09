@@ -1,7 +1,9 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcryptjs';
+import { randomInt } from 'crypto';
 import { Repository } from 'typeorm';
+import { EmailService } from '../email/email.service';
 import { OrderService } from '../order/order.service';
 import { UpdateProfileDTO } from './DTO/update-profile.dto';
 import { UserEntity } from './entities/user.entity';
@@ -12,7 +14,8 @@ export class UsersService {
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     private readonly orderService: OrderService,
-  ) {}
+    private readonly emailService: EmailService,
+  ) { }
 
   // BUSCAR EMAIL
   async findUserByEmail(email: string): Promise<UserEntity | null> {
@@ -49,15 +52,6 @@ export class UsersService {
     return this.userRepository.find();
   }
 
-  // BLOQUEAR USUARIO (ya no se elimina, se bloquea; el login queda rechazado)
-  async removeUser(id: string): Promise<{ message: string }> {
-    const result = await this.userRepository.update(id, { isActive: false });
-    if (result.affected === 0) {
-      throw new NotFoundException('Usuario no encontrado');
-    }
-    return { message: 'Usuario bloqueado correctamente' };
-  }
-
   // DESBLOQUEAR USUARIO
   async restoreUser(id: string): Promise<{ message: string }> {
     const result = await this.userRepository.update(id, { isActive: true });
@@ -67,17 +61,31 @@ export class UsersService {
     return { message: 'Usuario desbloqueado correctamente' };
   }
 
+  // Metodo privado para generar un codigo de 4 digitos criptográfico
+  private generateCode(): string {
+    return String(randomInt(1000, 10000))
+  }
+
   /********************** PROFILE **********************/
 
   // OBETER PERFIL, no se incluye pass ni el codigo de verificacion
   async getProfile(id: string) {
     const user = await this.findUserById(id);
     if (!user) throw new NotFoundException('Usuario no encontrado');
-    const { password, verificationCode, ...safeUser } = user;
+    const {
+      password,
+      verificationCode,
+      passResetAtt,
+      passResetExpires,
+      passResetCode,
+      verificAtt,
+      ...safeUser
+    } = user;
+
     return safeUser;
   }
 
-  // ACTUALIZAR PERFIL: nombre || email
+  // ACTUALIZAR PERFIL: nombre o email
   async updateProfile(id: string, data: UpdateProfileDTO) {
     const user = await this.findUserById(id);
     if (!user) throw new NotFoundException('Usuario no encontrado');
@@ -95,14 +103,16 @@ export class UsersService {
         throw new ConflictException('El email esta siendo usado por otro Usuario');
 
       // reverificacion del email con el codigo
-      const verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
+      const verificationCode = this.generateCode();
       await this.updateUser(id, {
         email: data.email,
         emailVerified: false,
         verificationCode,
+        verificAtt: 0
       });
 
-      console.log(`[EMAIL SIMULADO] Código de verificación para ${data.email}: ${verificationCode}`);
+      // enviar email 
+      await this.emailService.sendVerificCode(data.email, verificationCode);
     }
 
     // si cambia el nombre solamente
